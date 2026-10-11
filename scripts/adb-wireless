@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Wrapper around adb wireless debugging (Android 11+).
+# Usage:
+#   scripts/adb-wireless pair <phone-ip>:<pair-port>   # then enter 6-digit PIN
+#   scripts/adb-wireless connect <phone-ip>:<conn-port>
+#   scripts/adb-wireless devices
+set -euo pipefail
+
+cmd="${1:-help}"
+case "$cmd" in
+  pair)
+    target="${2:?Usage: scripts/adb-wireless pair <ip>:<pair-port>}"
+    adb pair "$target"
+    ;;
+  connect)
+    target="${2:?Usage: scripts/adb-wireless connect <ip>:<connect-port>}"
+    adb connect "$target"
+    ;;
+  devices)
+    adb devices -l
+    ;;
+  disconnect)
+    target="${2:-}"
+    if [ -n "$target" ]; then
+      adb disconnect "$target"
+    else
+      adb disconnect
+    fi
+    ;;
+  *)
+    echo "Usage:"
+    echo "  scripts/adb-wireless pair <ip>:<pair-port>"
+    echo "  scripts/adb-wireless connect <ip>:<conn-port>"
+    echo "  scripts/adb-wireless devices"
+    echo "  scripts/adb-wireless disconnect [target]"
+    exit 1
+    ;;
+esac

@@ -1,0 +1,22 @@
+{
+  // Workspace settings for the Android template.
+  // Container defaults come from .devcontainer/devcontainer.json;
+  // values here win for this workspace.
+  "android.sdkPath": "/opt/android-sdk",
+  "java.jdt.ls.java.home": "/docker-java-home",
+  "gradle.nestedProjects": false,
+  "gradle.autoDetect": "on",
+  "kotlin.languageServer.enabled": true,
+  "files.eol": "\n",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.exclude": {
+    "**/build": true,
+    "**/.gradle": true,
+    "**/.idea": true,
+    "**/*.iml": true,
+    "**/local.properties": true
+  }
+}

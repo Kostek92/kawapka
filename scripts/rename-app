@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Rename the sample app into your real app.
+# Usage: scripts/rename-app <new.application.id> <"App Display Name"> [RootProjectName]
+# Example: scripts/rename-app com.kostek92.shoppinglist "Shopping List"
+#
+# Must run from the repo root with a clean git tree.
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+    echo "Usage: scripts/rename-app <new.application.id> <\"App Display Name\"> [RootProjectName]" >&2
+    exit 1
+fi
+
+NEW_ID="$1"
+APP_NAME="$2"
+# Default root name: display name without spaces, e.g. "Shopping List" -> "ShoppingList".
+ROOT_NAME="${3:-$(echo "$APP_NAME" | tr -d ' ')}"
+NEW_THEME="Theme.$(echo "$APP_NAME" | tr -d ' ' | tr -cd 'A-Za-z0-9_')"
+
+[[ -f settings.gradle.kts && -f app/build.gradle.kts ]] || {
+    echo "Error: run from the repo root (settings.gradle.kts and app/build.gradle.kts not found)." >&2
+    exit 1
+}
+
+if ! [[ "$NEW_ID" =~ ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$ ]]; then
+    echo "Error: '$NEW_ID' is not a valid lowercase application id." >&2
+    exit 1
+fi
+
+if [[ -n "$(git status --porcelain)" ]]; then
+    echo "Error: working tree is dirty — commit or stash first, then re-run." >&2
+    exit 1
+fi
+
+OLD_ID="$(grep -m1 'applicationId = ' app/build.gradle.kts | sed 's/.*applicationId = "\(.*\)"/\1/')"
+[[ -n "$OLD_ID" ]] || { echo "Error: could not read current applicationId." >&2; exit 1; }
+
+if [[ "$OLD_ID" == "$NEW_ID" ]]; then
+    echo "Nothing to do: applicationId is already '$NEW_ID'."
+    exit 0
+fi
+
+OLD_THEME="$(grep -m1 -o 'name="Theme\.[A-Za-z0-9_]*"' app/src/main/res/values/themes.xml | sed 's/name="//; s/"//')"
+[[ -n "$OLD_THEME" ]] || { echo "Error: could not read current theme name." >&2; exit 1; }
+
+OLD_PKG_DIR="app/src/main/java/$(echo "$OLD_ID" | tr '.' '/')"
+NEW_PKG_DIR="app/src/main/java/$(echo "$NEW_ID" | tr '.' '/')"
+[[ -d "$OLD_PKG_DIR" ]] || { echo "Error: package dir $OLD_PKG_DIR not found." >&2; exit 1; }
+
+echo "Renaming '$OLD_ID' -> '$NEW_ID' (app '$APP_NAME', $OLD_THEME -> $NEW_THEME)..."
+
+# 1. applicationId + namespace + package statements (every occurrence of the old id).
+grep -rl "$OLD_ID" app/build.gradle.kts app/src settings.gradle.kts 2>/dev/null \
+    | xargs sed -i "s/$OLD_ID/$NEW_ID/g"
+
+# 2. Move the package directory (git mv keeps history).
+mkdir -p "$(dirname "$NEW_PKG_DIR")"
+git mv "$OLD_PKG_DIR" "$NEW_PKG_DIR"
+
+# 3. Theme name in themes.xml + AndroidManifest.xml.
+grep -rl "$OLD_THEME" app/src 2>/dev/null | xargs sed -i "s/$OLD_THEME/$NEW_THEME/g"
+
+# 4. Display name + Gradle project name.
+sed -i "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">$APP_NAME</string>|" \
+    app/src/main/res/values/strings.xml
+sed -i "s|^rootProject.name = .*|rootProject.name = \"$ROOT_NAME\"|" settings.gradle.kts
+
+echo "Done. Review with: git status"
+echo "Next:"
+echo "  1. Update README.md (it still describes the Hello World sample)."
+echo "  2. Rebuild: ./gradlew installDebug"
+echo "  3. Optional: remove the old sample from your phone: adb uninstall $OLD_ID"

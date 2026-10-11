@@ -1,0 +1,41 @@
+{
+  "name": "Android Hobby",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "remoteUser": "vscode",
+  // Privileged helps if you later pass USB devices through.
+  // NOTE: no /dev/bus/usb bind here — that path doesn't exist on WSL2
+  // and Docker fails to start if a bind source is missing.
+  // For USB debugging, attach via usbipd on Windows, then either use
+  // adb from WSL or re-add the bind after `sudo mkdir -p /dev/bus/usb`.
+  "runArgs": ["--privileged"],
+  "mounts": [
+    "source=android-gradle-cache,target=/home/vscode/.gradle,type=volume",
+    "source=android-adb-keys,target=/home/vscode/.android,type=volume"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jetbrains.kotlin-server",
+        "vscjava.vscode-gradle",
+        "AndroidGradleTools.android-ide-extension"
+      ],
+      "settings": {
+        "java.jdt.ls.java.home": "/docker-java-home",
+        "android.sdkPath": "/opt/android-sdk",
+        "gradle.nestedProjects": false,
+        "gradle.autoDetect": "on",
+        "jetbrains.kotlin.hints.enable": true,
+        "files.eol": "\n"
+      }
+    }
+  },
+  "remoteEnv": {
+    "ANDROID_SDK_ROOT": "/opt/android-sdk",
+    "ANDROID_HOME": "/opt/android-sdk"
+  },
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.android /home/vscode/.gradle; chmod +x scripts/adb-wireless && printf 'sdk.dir=/opt/android-sdk\n' > local.properties && sdkmanager --list_installed && adb version",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+}
