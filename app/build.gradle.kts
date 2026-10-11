@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.helloworld"
+    namespace = "com.application.podlog"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.helloworld"
+        applicationId = "com.application.podlog"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

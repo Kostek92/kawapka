@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Android"
+rootProject.name = "Podlog"
 include(":app")

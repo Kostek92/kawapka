@@ -1,4 +1,4 @@
-package com.example.helloworld
+package com.application.podlog
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
