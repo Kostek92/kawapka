@@ -61,6 +61,12 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
 - Product requirements and scope boundaries live in `docs/PRODUCT_SPEC.md`;
   implementation order and completion criteria live in `docs/ROADMAP.md`.
   Read the relevant document before planning or implementing app features.
+- Visual reference lives in `docs/prototype/` — `screens/*.png` are the mockups
+  and `code/*.html` their HTML source. Use it as a prototype/visual source for
+  layout, styling, and flow only: its labels and copy contain deliberate or
+  outdated wording that does not match this app (e.g. “Discover”, “My Coffees”,
+  “Favourites” where the spec says catalogue / personal collection). When the
+  prototype and `PRODUCT_SPEC.md` disagree, the spec wins.
 - Follow `docs/ROADMAP.md` for the implementation sequence. Prefer the smallest
   useful increment and do not implement later-phase features prematurely.
 - After finishing any roadmap phase, run the `phase-verification` skill before

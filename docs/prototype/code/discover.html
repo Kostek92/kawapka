@@ -1,0 +1,406 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Discover — Coffee Catalogue</title>
+<!-- Material Symbols Outlined Font -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration verbatim as defined in Design System -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed": "#ffdcc2",
+            "error-container": "#ffdad6",
+            "surface-variant": "#e4e2df",
+            "outline-variant": "#d2c3bf",
+            "inverse-surface": "#30312f",
+            "surface-bright": "#fbf9f6",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#947f79",
+            "on-primary-fixed-variant": "#54433e",
+            "on-error-container": "#93000a",
+            "surface-tint": "#6d5a55",
+            "surface-container-low": "#f5f3f0",
+            "on-background": "#1b1c1a",
+            "on-surface-variant": "#4f4542",
+            "primary-fixed": "#f7ddd6",
+            "primary-container": "#261814",
+            "on-tertiary-container": "#af7a05",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed": "#281900",
+            "inverse-primary": "#dac1ba",
+            "surface-container-high": "#eae8e5",
+            "surface": "#fbf9f6",
+            "surface-container-highest": "#e4e2df",
+            "tertiary": "#000000",
+            "secondary": "#8d4f09",
+            "primary-fixed-dim": "#dac1ba",
+            "inverse-on-surface": "#f2f0ed",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#281900",
+            "on-primary-fixed": "#261814",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-container": "#753f00",
+            "tertiary-fixed-dim": "#fabc4d",
+            "primary": "#000000",
+            "surface-dim": "#dbdad7",
+            "on-secondary-fixed-variant": "#6d3a00",
+            "on-surface": "#1b1c1a",
+            "background": "#fbf9f6",
+            "secondary-container": "#feac62",
+            "on-secondary-fixed": "#2e1500",
+            "secondary-fixed-dim": "#ffb77a",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "tertiary-fixed": "#ffdead",
+            "outline": "#817471",
+            "on-tertiary-fixed-variant": "#604100",
+            "surface-container": "#efeeeb"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "margin-expanded": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-compact": "0.75rem"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "title-md": ["Inter"],
+            "label-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-sm": ["Inter"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 500;
+    }
+    /* Hide scrollbar for category pills on horizontal scroll */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased selection:bg-secondary-fixed selection:text-on-secondary-fixed min-h-screen pb-28" style="min-height: 844px; max-height: 844px; width: 390px; margin: 0px auto; overflow-y: auto; position: relative;">
+<!-- ================= TOP APP BAR (Shared Components JSON Anchor) ================= -->
+<!-- TopAppBar: small_center_aligned, headline: "Coffee Pod", leading: "coffee", trailing: "search" -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-margin h-16 w-full bg-surface dark:bg-inverse-surface shadow-sm dark:shadow-none">
+<div class="flex items-center space-x-2">
+<button aria-label="Coffee Pod Menu" class="w-10 h-10 rounded-full flex items-center justify-center text-primary dark:text-inverse-primary hover:bg-surface-container-high dark:hover:bg-surface-variant active:scale-95 transition-all duration-150">
+<span class="material-symbols-outlined text-[24px]">coffee</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface dark:text-inverse-on-surface">Coffee Pod</h1>
+</div>
+<div class="flex items-center space-x-1">
+<button aria-label="Search Collection" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-variant active:scale-95 transition-all duration-150">
+<span class="material-symbols-outlined text-[22px]">search</span>
+</button>
+<button aria-label="Profile" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-variant active:scale-95 transition-all duration-150"><span class="material-symbols-outlined text-[22px]">account_circle</span></button>
+</div>
+</header>
+<!-- Main Canvas Container -->
+<main class="pt-20 px-margin max-w-md mx-auto w-full">
+<!-- ================= SEARCH BAR ================= -->
+<section class="mt-2 mb-4">
+<div class="relative flex items-center w-full h-[52px] bg-surface-container rounded-full px-4 shadow-[0_2px_8px_rgba(34,21,17,0.03)] border border-surface-variant/40 focus-within:border-secondary transition-all">
+<span aria-hidden="true" class="material-symbols-outlined text-secondary mr-3 text-[22px]">search</span>
+<input class="w-full bg-transparent border-none p-0 text-body-md font-body-md text-on-surface placeholder:text-outline focus:ring-0 focus:outline-none" placeholder="Search 40+ Nespresso Original capsules..." type="search">
+<div class="flex items-center space-x-1 ml-2">
+<button aria-label="Filter" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+<button aria-label="Voice Search" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ================= FILTER CHIPS ================= -->
+
+<!-- ================= HERO SECTION BANNER ================= -->
+
+<!-- ================= CATALOGUE GRID (2-Column Asymmetric Cards) ================= -->
+<div class="grid grid-cols-2 gap-3 pb-6">
+<!-- CARD 1: Ispirazione Ristretto Italiano (In Collection) -->
+<article class="bg-surface-container-lowest rounded-2xl p-3.5 border border-outline-variant/50 shadow-[0_2px_8px_rgba(34,21,17,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<!-- Cup & Intensity Header -->
+<div class="flex items-center mb-2 justify-end">
+
+<span class="text-label-sm font-label-sm font-bold bg-primary text-on-primary px-1.5 py-0.5 rounded">
+              10
+            </span>
+</div>
+<!-- Capsule Metallic Visual -->
+<div class="my-2.5 flex justify-center items-center py-2 relative">
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-neutral-800 via-neutral-900 to-black shadow-inner flex items-center justify-center border-2 border-neutral-700/60 relative">
+<div class="w-8 h-8 rounded-full border border-neutral-600/50 flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-600/80"></span>
+</div>
+</div>
+</div>
+<!-- Card Info -->
+<h3 class="text-title-md font-title-md text-on-surface line-clamp-1 leading-tight">Ristretto Italiano</h3>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">Rich &amp; Contrasting</p>
+<div class="flex flex-wrap gap-1 mt-2">
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Roasty</span>
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Cocoa</span>
+</div>
+</div>
+<!-- Action Indicator: In Collection -->
+<div class="mt-3.5 pt-2 border-t border-surface-variant/50">
+<button class="w-full h-8 rounded-full bg-surface-container-high text-on-surface text-label-sm font-label-sm flex items-center justify-center space-x-1 cursor-default"><span class="material-symbols-outlined text-[14px] text-secondary">check</span><span class="">Added</span></button>
+</div>
+</article>
+<!-- CARD 2: Ispirazione Genova Livanto (Add to Collection) -->
+<article class="bg-surface-container-lowest rounded-2xl p-3.5 border border-outline-variant/50 shadow-[0_2px_8px_rgba(34,21,17,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<!-- Cup & Intensity Header -->
+<div class="flex items-center mb-2 justify-end">
+
+<span class="text-label-sm font-label-sm font-bold bg-primary text-on-primary px-1.5 py-0.5 rounded">
+              6
+            </span>
+</div>
+<!-- Capsule Metallic Visual (Copper / Amber Bronze) -->
+<div class="my-2.5 flex justify-center items-center py-2 relative">
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-600 via-amber-700 to-yellow-900 shadow-inner flex items-center justify-center border-2 border-amber-500/70 relative">
+<div class="w-8 h-8 rounded-full border border-amber-400/50 flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-300"></span>
+</div>
+</div>
+</div>
+<!-- Card Info -->
+<h3 class="text-title-md font-title-md text-on-surface line-clamp-1 leading-tight">Genova Livanto</h3>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">Round &amp; Caramelized</p>
+<div class="flex flex-wrap gap-1 mt-2">
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Caramel</span>
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Cereal</span>
+</div>
+</div>
+<!-- Action Indicator: Add Action -->
+<div class="mt-3.5 pt-2 border-t border-surface-variant/50">
+<button class="w-full h-8 rounded-full border border-secondary text-secondary hover:bg-secondary hover:text-on-secondary active:scale-95 transition-all text-label-sm font-label-sm flex items-center justify-center space-x-1"><span class="material-symbols-outlined text-[14px]">add</span><span class="">Add</span></button>
+</div>
+</article>
+<!-- CARD 3: Master Origin India (Add to Collection) -->
+<article class="bg-surface-container-lowest rounded-2xl p-3.5 border border-outline-variant/50 shadow-[0_2px_8px_rgba(34,21,17,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<!-- Cup & Intensity Header -->
+<div class="flex items-center mb-2 justify-end">
+
+<span class="text-label-sm font-label-sm font-bold bg-primary text-on-primary px-1.5 py-0.5 rounded">
+              11
+            </span>
+</div>
+<!-- Capsule Metallic Visual (Warm Bronze/Teal Rim) -->
+<div class="my-2.5 flex justify-center items-center py-2 relative">
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-teal-900 via-stone-800 to-amber-950 shadow-inner flex items-center justify-center border-2 border-teal-700/60 relative">
+<div class="w-8 h-8 rounded-full border border-amber-500/40 flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span>
+</div>
+</div>
+</div>
+<!-- Card Info -->
+<h3 class="text-title-md font-title-md text-on-surface line-clamp-1 leading-tight">Master Origin India</h3>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">Intense &amp; Spicy</p>
+<div class="flex flex-wrap gap-1 mt-2">
+<span class="px-2 py-0.5 rounded-md bg-secondary-fixed/60 text-on-secondary-fixed text-label-sm font-label-sm">Monsooned Robusta</span>
+</div>
+</div>
+<!-- Action Indicator: Add Action -->
+<div class="mt-3.5 pt-2 border-t border-surface-variant/50">
+<button class="w-full h-8 rounded-full border border-secondary text-secondary hover:bg-secondary hover:text-on-secondary active:scale-95 transition-all text-label-sm font-label-sm flex items-center justify-center space-x-1"><span class="material-symbols-outlined text-[14px]">add</span><span class="">Add</span></button>
+</div>
+</article>
+<!-- CARD 4: Barista Creations Chiaro (In Collection) -->
+<article class="bg-surface-container-lowest rounded-2xl p-3.5 border border-outline-variant/50 shadow-[0_2px_8px_rgba(34,21,17,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<!-- Cup & Recipe Header -->
+<div class="flex items-center mb-2 justify-end">
+
+<span class="text-label-sm font-label-sm font-semibold text-outline-variant bg-surface-container-high px-1.5 py-0.5 rounded">
+              Mild
+            </span>
+</div>
+<!-- Capsule Metallic Visual (Silvery Sand / Biscuit) -->
+<div class="my-2.5 flex justify-center items-center py-2 relative">
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-stone-300 via-amber-100 to-stone-400 shadow-inner flex items-center justify-center border-2 border-stone-300/80 relative">
+<div class="w-8 h-8 rounded-full border border-amber-200/80 flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+</div>
+</div>
+</div>
+<!-- Card Info -->
+<h3 class="text-title-md font-title-md text-on-surface line-clamp-1 leading-tight">Creations Chiaro</h3>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">Mild &amp; Sweet</p>
+<div class="flex flex-wrap gap-1 mt-2">
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Biscuit</span>
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Sweet Milk</span>
+</div>
+</div>
+<!-- Action Indicator: In Collection -->
+<div class="mt-3.5 pt-2 border-t border-surface-variant/50">
+<button class="w-full h-8 rounded-full bg-surface-container-high text-on-surface text-label-sm font-label-sm flex items-center justify-center space-x-1 cursor-default"><span class="material-symbols-outlined text-[14px] text-secondary">check</span><span class="">Added</span></button>
+</div>
+</article>
+<!-- CARD 5: Ispirazione Firenze Arpeggio (In Collection) -->
+<article class="bg-surface-container-lowest rounded-2xl p-3.5 border border-outline-variant/50 shadow-[0_2px_8px_rgba(34,21,17,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<!-- Cup & Intensity Header -->
+<div class="flex items-center mb-2 justify-end">
+
+<span class="text-label-sm font-label-sm font-bold bg-primary text-on-primary px-1.5 py-0.5 rounded">
+              9
+            </span>
+</div>
+<!-- Capsule Metallic Visual (Deep Violet / Purple Sheen) -->
+<div class="my-2.5 flex justify-center items-center py-2 relative">
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950 shadow-inner flex items-center justify-center border-2 border-purple-700/60 relative">
+<div class="w-8 h-8 rounded-full border border-purple-400/40 flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-purple-300"></span>
+</div>
+</div>
+</div>
+<!-- Card Info -->
+<h3 class="text-title-md font-title-md text-on-surface line-clamp-1 leading-tight">Firenze Arpeggio</h3>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">Dense &amp; Creamy</p>
+<div class="flex flex-wrap gap-1 mt-2">
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Cocoa</span>
+<span class="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm">Velvety</span>
+</div>
+</div>
+<!-- Action Indicator: In Collection -->
+<div class="mt-3.5 pt-2 border-t border-surface-variant/50">
+<button class="w-full h-8 rounded-full bg-surface-container-high text-on-surface text-label-sm font-label-sm flex items-center justify-center space-x-1 cursor-default"><span class="material-symbols-outlined text-[14px] text-secondary">check</span><span class="">Added</span></button>
+</div>
+</article>
+<!-- CARD 6: Master Origin Nicaragua (Add to Collection) -->
+<article class="bg-surface-container-lowest rounded-2xl p-3.5 border border-outline-variant/50 shadow-[0_2px_8px_rgba(34,21,17,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<!-- Cup & Intensity Header -->
+<div class="flex items-center mb-2 justify-end">
+
+<span class="text-label-sm font-label-sm font-bold bg-primary text-on-primary px-1.5 py-0.5 rounded">
+              5
+            </span>
+</div>
+<!-- Capsule Metallic Visual (Warm Golden Honey) -->
+<div class="my-2.5 flex justify-center items-center py-2 relative">
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 via-amber-600 to-yellow-800 shadow-inner flex items-center justify-center border-2 border-amber-400/80 relative">
+<div class="w-8 h-8 rounded-full border border-amber-200/50 flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-yellow-200"></span>
+</div>
+</div>
+</div>
+<!-- Card Info -->
+<h3 class="text-title-md font-title-md text-on-surface line-clamp-1 leading-tight">Nicaragua</h3>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">Sweet &amp; Cereal</p>
+<div class="flex flex-wrap gap-1 mt-2">
+<span class="px-2 py-0.5 rounded-md bg-secondary-fixed/60 text-on-secondary-fixed text-label-sm font-label-sm">Black Honey</span>
+</div>
+</div>
+<!-- Action Indicator: Add Action -->
+<div class="mt-3.5 pt-2 border-t border-surface-variant/50">
+<button class="w-full h-8 rounded-full border border-secondary text-secondary hover:bg-secondary hover:text-on-secondary active:scale-95 transition-all text-label-sm font-label-sm flex items-center justify-center space-x-1"><span class="material-symbols-outlined text-[14px]">add</span><span class="">Add</span></button>
+</div>
+</article>
+</div>
+<!-- TASTING ADVICE CALLOUT / CARD FOOTER -->
+
+</main>
+<!-- ================= BOTTOM NAVIGATION BAR (Shared Components JSON Anchor) ================= -->
+<!-- BottomNavBar: label_icon, destination_count: 3, label_texts: ["My Coffees", "Discover", "Favourites"], icons: ["local_cafe", "explore", "favorite"] -->
+<!-- Contextual Active: Intent is 'Discover' screen -> Index 1 ('Discover') is active with style_active_navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around h-20 w-full px-gutter pb-safe bg-surface dark:bg-inverse-surface shadow-[0_-4px_20px_rgba(34,21,17,0.06)] border-t border-surface-variant dark:border-outline-variant">
+<!-- Item 1: My Coffees (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-3 py-1 hover:bg-surface-container-high dark:hover:bg-surface-variant active:scale-95 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="local_cafe">local_cafe</span>
+<span class="text-label-md font-label-md mt-0.5">My Coffees</span>
+</a>
+<!-- Item 2: Discover (Active Intent Match) -->
+<a class="flex flex-col items-center justify-center bg-secondary-fixed dark:bg-secondary-container text-on-secondary-fixed dark:text-on-secondary-container rounded-full px-5 py-1 active:scale-95 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[24px] fill-icon" data-icon="explore">explore</span>
+<span class="text-label-md font-label-md mt-0.5">Discover</span>
+</a>
+<!-- Item 3: Favourites (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-3 py-1 hover:bg-surface-container-high dark:hover:bg-surface-variant active:scale-95 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="favorite">favorite</span>
+<span class="text-label-md font-label-md mt-0.5">Favourites</span>
+</a>
+</nav>
+<!-- Interactive script for quick tap toggling without reload -->
+<script>
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        if(this.textContent.includes('Add Pod')) {
+          this.className = "w-full h-8 rounded-full bg-surface-container-high text-on-surface text-label-sm font-label-sm flex items-center justify-center space-x-1 cursor-default";
+          this.innerHTML = '<span class="material-symbols-outlined text-[14px] text-secondary">check_circle</span><span>In My Coffees</span>';
+        }
+      });
+    });
+  </script>
+
+
+
+
+
+
+</body></html>

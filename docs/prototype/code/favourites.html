@@ -1,0 +1,401 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Favourites</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS Play CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed": "#ffdcc2",
+            "error-container": "#ffdad6",
+            "surface-variant": "#e4e2df",
+            "outline-variant": "#d2c3bf",
+            "inverse-surface": "#30312f",
+            "surface-bright": "#fbf9f6",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#947f79",
+            "on-primary-fixed-variant": "#54433e",
+            "on-error-container": "#93000a",
+            "surface-tint": "#6d5a55",
+            "surface-container-low": "#f5f3f0",
+            "on-background": "#1b1c1a",
+            "on-surface-variant": "#4f4542",
+            "primary-fixed": "#f7ddd6",
+            "primary-container": "#261814",
+            "on-tertiary-container": "#af7a05",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed": "#281900",
+            "inverse-primary": "#dac1ba",
+            "surface-container-high": "#eae8e5",
+            "surface": "#fbf9f6",
+            "surface-container-highest": "#e4e2df",
+            "tertiary": "#000000",
+            "secondary": "#8d4f09",
+            "primary-fixed-dim": "#dac1ba",
+            "inverse-on-surface": "#f2f0ed",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#281900",
+            "on-primary-fixed": "#261814",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-container": "#753f00",
+            "tertiary-fixed-dim": "#fabc4d",
+            "primary": "#000000",
+            "surface-dim": "#dbdad7",
+            "on-secondary-fixed-variant": "#6d3a00",
+            "on-surface": "#1b1c1a",
+            "background": "#fbf9f6",
+            "secondary-container": "#feac62",
+            "on-secondary-fixed": "#2e1500",
+            "secondary-fixed-dim": "#ffb77a",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "tertiary-fixed": "#ffdead",
+            "outline": "#817471",
+            "on-tertiary-fixed-variant": "#604100",
+            "surface-container": "#efeeeb"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "margin-expanded": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-compact": "0.75rem"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "title-md": ["Inter"],
+            "label-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-sm": ["Inter"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-secondary-fixed selection:text-on-secondary-fixed" style="min-height: 844px; height: 844px; max-height: 844px; width: 390px; max-width: 390px; margin: 0px auto; overflow: hidden auto; position: relative;">
+<!-- Top App Bar (Shared Component Structure adapted for Favourites Destination) -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-margin h-16 w-full bg-surface shadow-sm" style="position: sticky; top: 0px; width: 100%; max-width: 390px; z-index: 50;"><div class="flex items-center gap-space-sm">
+  <button aria-label="User Profile" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high active:scale-95 transition-all text-on-surface">
+    <span class="material-symbols-outlined text-[24px]">person</span>
+  </button>
+  <h1 class="text-headline-sm font-headline-sm text-on-surface leading-tight tracking-tight">Favourites</h1>
+</div>
+<div class="flex items-center gap-1">
+  <button aria-label="Search" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high active:scale-95 transition-all text-on-surface">
+    <span class="material-symbols-outlined text-[24px]">search</span>
+  </button>
+</div></header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-md mx-auto px-margin pt-20 pb-28" style="padding-top: 1rem; padding-bottom: 1.5rem; width: 100%; max-width: 390px;">
+<!-- Stat Summary Tasting Banner (Sensory Crema Tonal Container) -->
+
+<!-- Favourites Capsules Catalog Grid (2-column tactile layout) -->
+<section aria-label="Bookmarked Capsules Grid" class="grid grid-cols-2 gap-3"><!-- Item 1: Ispirazione Palermo Kazaar -->
+<article class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex flex-col justify-between shadow-sm relative group hover:border-secondary transition-all">
+  <!-- Top Meta Row (Cup Serving Size & Intensity Badge) -->
+  <div class="flex items-center justify-end mb-2">
+    <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-primary text-on-primary text-[11px] font-bold shadow-sm">12</span>
+  </div>
+  
+  <!-- Capsule Imagery -->
+  <div class="my-2 flex flex-col items-center justify-center">
+    <div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center relative overflow-hidden shadow-inner">
+      <img class="w-16 h-16 object-contain transform group-hover:scale-105 transition-transform" data-alt="Palermo Kazaar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZEJEZ3meOMk4kFtu3klApwi6GSjAp4kzzfLdbxZKl-gVRfwvJguJoqITLuGIIB48aRl-cqgWcD15xTRQXMXu67T_oacvhFegNjyXFOuBSOyHjrbBJugty7zBTIbWqlh3kGhrp2u7ZV_Yf6ZAeNu8yLwGeo4n8oLKroe8NfI_cJL_rlldxQC0w26c2zjVT-Mr7pKDv0pow41JOn9A2kCNDAPG_NTd1gQQs5nEAocoLfk46duGWQd1H">
+    </div>
+  </div>
+
+  <!-- Title & Roast Subtitle -->
+  <div class="mt-1 mb-2.5">
+    <h2 class="text-title-md font-title-md text-on-surface leading-tight font-bold line-clamp-1">Ispirazione Palermo</h2>
+    <p class="text-body-sm font-body-sm text-on-surface-variant line-clamp-1 mt-0.5">Cocoa &amp; Peppery</p>
+    <div class="flex flex-wrap gap-1 mt-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Intense</span>
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Dark</span>
+    </div>
+  </div>
+
+  <!-- Bottom Rate Pill (Equivalent position to Discover Add button) -->
+  <button aria-label="Rate Ispirazione Palermo" class="w-full py-1.5 px-3 rounded-full bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 flex items-center justify-center gap-1.5 text-label-md font-label-md text-secondary transition-colors active:scale-95">
+    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+    <span class="font-bold">5.0</span>
+    <span class="text-[11px] text-on-surface-variant font-normal">(Rate)</span>
+  </button>
+</article>
+
+<!-- Item 2: Ispirazione Firenze Arpeggio -->
+<article class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex flex-col justify-between shadow-sm relative group hover:border-secondary transition-all">
+  <!-- Top Meta Row -->
+  <div class="flex items-center justify-end mb-2">
+    <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-primary text-on-primary text-[11px] font-bold shadow-sm">9</span>
+  </div>
+  
+  <!-- Capsule Imagery -->
+  <div class="my-2 flex flex-col items-center justify-center">
+    <div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center relative overflow-hidden shadow-inner">
+      <img class="w-16 h-16 object-contain transform group-hover:scale-105 transition-transform" data-alt="Firenze Arpeggio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5h9KjgN-4ivM7sLXJjJgFedfyHH99JaV6OOnqnmi3mfr3ylHZA2lwfXNfBBuqVI20keQf2JKtJwFl3OL5FJ-BhcAt6bFXw6YUKKeTC9CtfIPnV6LsOzUkd5Fk_D-6Nbyin1uwOPPjhliwjM-ECjdS4D2CVLa7JpPMuBuyLCCoG9mq4G0vOaawLS1fx_PbvdeWSLjcruxtWvYz8FIv6SSyasHiy34tbhNEPzCTBPyH7zfdt7KecrpY">
+    </div>
+  </div>
+
+  <!-- Title & Roast Subtitle -->
+  <div class="mt-1 mb-2.5">
+    <h2 class="text-title-md font-title-md text-on-surface leading-tight font-bold line-clamp-1">Ispirazione Firenze</h2>
+    <p class="text-body-sm font-body-sm text-on-surface-variant line-clamp-1 mt-0.5">Cocoa &amp; Velvety</p>
+    <div class="flex flex-wrap gap-1 mt-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Creamy</span>
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Roasty</span>
+    </div>
+  </div>
+
+  <!-- Bottom Rate Pill -->
+  <button aria-label="Rate Ispirazione Firenze" class="w-full py-1.5 px-3 rounded-full bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 flex items-center justify-center gap-1.5 text-label-md font-label-md text-secondary transition-colors active:scale-95">
+    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+    <span class="font-bold">5.0</span>
+    <span class="text-[11px] text-on-surface-variant font-normal">(Rate)</span>
+  </button>
+</article>
+
+<!-- Item 3: Ispirazione Napoli -->
+<article class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex flex-col justify-between shadow-sm relative group hover:border-secondary transition-all">
+  <!-- Top Meta Row -->
+  <div class="flex items-center justify-end mb-2">
+    <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-primary text-on-primary text-[11px] font-bold shadow-sm">13</span>
+  </div>
+  
+  <!-- Capsule Imagery -->
+  <div class="my-2 flex flex-col items-center justify-center">
+    <div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center relative overflow-hidden shadow-inner">
+      <img class="w-16 h-16 object-contain transform group-hover:scale-105 transition-transform" data-alt="Ispirazione Napoli" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGxv5pz8nivJJu5NBUodcKbt0va_KM6cdCW8aXvo4jnEfnlVOwBGpWbrXvWeF1DXwtvUopbI97UmnqeL-ukpmgVoKn5iQdXC1g3dgoVa1Q_VgukU3Tf5QDXMw1jTT0VSrVVN6nXRz4LNWmTFWlb7838cnx_7vx535umi5vdJrHTIL8U25Fdvew8-1be0H6TJ-g2b28cSq_RZM_Js6_ujT4G4chUfOxpLpOCiBVT0oqPePbwMKx7e77">
+    </div>
+  </div>
+
+  <!-- Title & Roast Subtitle -->
+  <div class="mt-1 mb-2.5">
+    <h2 class="text-title-md font-title-md text-on-surface leading-tight font-bold line-clamp-1">Ispirazione Napoli</h2>
+    <p class="text-body-sm font-body-sm text-on-surface-variant line-clamp-1 mt-0.5">Dark Roast &amp; Bitter</p>
+    <div class="flex flex-wrap gap-1 mt-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Bold</span>
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Dark</span>
+    </div>
+  </div>
+
+  <!-- Bottom Rate Pill -->
+  <button aria-label="Rate Ispirazione Napoli" class="w-full py-1.5 px-3 rounded-full bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 flex items-center justify-center gap-1.5 text-label-md font-label-md text-secondary transition-colors active:scale-95">
+    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+    <span class="font-bold">4.5</span>
+    <span class="text-[11px] text-on-surface-variant font-normal">(Rate)</span>
+  </button>
+</article>
+
+<!-- Item 4: Master Origin Colombia -->
+<article class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex flex-col justify-between shadow-sm relative group hover:border-secondary transition-all">
+  <!-- Top Meta Row -->
+  <div class="flex items-center justify-end mb-2">
+    <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-primary text-on-primary text-[11px] font-bold shadow-sm">6</span>
+  </div>
+  
+  <!-- Capsule Imagery -->
+  <div class="my-2 flex flex-col items-center justify-center">
+    <div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center relative overflow-hidden shadow-inner">
+      <img class="w-16 h-16 object-contain transform group-hover:scale-105 transition-transform" data-alt="Master Origin Colombia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt42wuiMJycrYS40SX9c0erTstoxAiCqmpkNCdKWkGj1O7-ZPVjqTqHNxfWdarnLGwtB1-zcafMeh2pgE2IQVyQ9MPJqF8ulzTCW_RvmhIrl_jr_2DbqzSVx4YsKkzKunA-xvr3li4Tnhkk8_Vyc-sKX6UrhhCFQ7TG2GET55qks3PySGqbxPhOqN9sg5-yjF0vom9wp2aAj7_3c8y_lnF7HRkuJrO1IcFTlh8dZnTl4AXNOb6dqJ8">
+    </div>
+  </div>
+
+  <!-- Title & Roast Subtitle -->
+  <div class="mt-1 mb-2.5">
+    <h2 class="text-title-md font-title-md text-on-surface leading-tight font-bold line-clamp-1">Master Origin Colombia</h2>
+    <p class="text-body-sm font-body-sm text-on-surface-variant line-clamp-1 mt-0.5">Red Berries &amp; Winey</p>
+    <div class="flex flex-wrap gap-1 mt-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Fruity</span>
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Winey</span>
+    </div>
+  </div>
+
+  <!-- Bottom Rate Pill -->
+  <button aria-label="Rate Master Origin Colombia" class="w-full py-1.5 px-3 rounded-full bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 flex items-center justify-center gap-1.5 text-label-md font-label-md text-secondary transition-colors active:scale-95">
+    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+    <span class="font-bold">4.5</span>
+    <span class="text-[11px] text-on-surface-variant font-normal">(Rate)</span>
+  </button>
+</article>
+
+<!-- Item 5: Master Origin India -->
+<article class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex flex-col justify-between shadow-sm relative group hover:border-secondary transition-all">
+  <!-- Top Meta Row -->
+  <div class="flex items-center justify-end mb-2">
+    <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-primary text-on-primary text-[11px] font-bold shadow-sm">11</span>
+  </div>
+  
+  <!-- Capsule Imagery -->
+  <div class="my-2 flex flex-col items-center justify-center">
+    <div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center relative overflow-hidden shadow-inner">
+      <img class="w-16 h-16 object-contain transform group-hover:scale-105 transition-transform" data-alt="Master Origin India" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_uWuMVYt2coihS-AUO1aHuYJUqtuI7XlB66PzW0jiErtGJ6X_qKmrF6jIAoJIhJMMqZ4BwRM1RWZVtXmFG7CORU99KkCdDHNTq0c8X6OOLXihrFvmKos7x7KSgmZgH6HSRr6dJOeU26-lgmdVWUyU-t8boA-NnJP9nTMhUKkCcsvK5k9vNFS0axDxXsnjTliB9SjR2gxzskAPYxgcYBRDHQRm5hDYsWD7vl6ao7v35ylUaT_V8Prk">
+    </div>
+  </div>
+
+  <!-- Title & Roast Subtitle -->
+  <div class="mt-1 mb-2.5">
+    <h2 class="text-title-md font-title-md text-on-surface leading-tight font-bold line-clamp-1">Master Origin India</h2>
+    <p class="text-body-sm font-body-sm text-on-surface-variant line-clamp-1 mt-0.5">Spices &amp; Heavy Body</p>
+    <div class="flex flex-wrap gap-1 mt-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Spicy</span>
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Woody</span>
+    </div>
+  </div>
+
+  <!-- Bottom Rate Pill -->
+  <button aria-label="Rate Master Origin India" class="w-full py-1.5 px-3 rounded-full bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 flex items-center justify-center gap-1.5 text-label-md font-label-md text-secondary transition-colors active:scale-95">
+    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+    <span class="font-bold">4.0</span>
+    <span class="text-[11px] text-on-surface-variant font-normal">(Rate)</span>
+  </button>
+</article>
+
+<!-- Item 6: Barista Corto -->
+<article class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex flex-col justify-between shadow-sm relative group hover:border-secondary transition-all">
+  <!-- Top Meta Row -->
+  <div class="flex items-center justify-end mb-2">
+    <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-primary text-on-primary text-[11px] font-bold shadow-sm">11</span>
+  </div>
+  
+  <!-- Capsule Imagery -->
+  <div class="my-2 flex flex-col items-center justify-center">
+    <div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center relative overflow-hidden shadow-inner">
+      <img class="w-16 h-16 object-contain transform group-hover:scale-105 transition-transform" data-alt="Barista Corto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-0vuT4qutEn-rHhJ_cJmVMGXIyLpPAI8i2mUFvQSLc6c67XwTZ3YxY4tG97nMQ841V890oL8FHm_TMPdT18MJkSXmFZSqZsaOenaRHBDeFGKNYLbNKV6RwCKzaZPZepGkpuM2M-FmkD7KRFMmH0gsdQhhDO3aLc7-1qHXgKnyX9scwPIuK3ujFTvjfvFdJmZLUYvq3AqFzI_UNgOfCWld55A0f16Gl4Ewn1Ul4bQa8coMhvqxA5HQ">
+    </div>
+  </div>
+
+  <!-- Title & Roast Subtitle -->
+  <div class="mt-1 mb-2.5">
+    <h2 class="text-title-md font-title-md text-on-surface leading-tight font-bold line-clamp-1">Barista Corto</h2>
+    <p class="text-body-sm font-body-sm text-on-surface-variant line-clamp-1 mt-0.5">Syrupy &amp; Roasted</p>
+    <div class="flex flex-wrap gap-1 mt-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Syrupy</span>
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-high text-[11px] font-medium text-on-surface-variant">Roasty</span>
+    </div>
+  </div>
+
+  <!-- Bottom Rate Pill -->
+  <button aria-label="Rate Barista Corto" class="w-full py-1.5 px-3 rounded-full bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 flex items-center justify-center gap-1.5 text-label-md font-label-md text-secondary transition-colors active:scale-95">
+    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+    <span class="font-bold">4.0</span>
+    <span class="text-[11px] text-on-surface-variant font-normal">(Rate)</span>
+  </button>
+</article></section>
+<!-- Quick Journal Prompt Card -->
+
+</main>
+<!-- Bottom Navigation Bar (Shared Components JSON execution) -->
+<!-- Note: Favourites tab matches active state logic precisely and receives style_active_navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around h-20 w-full px-gutter pb-safe bg-surface shadow-sm" style="position: fixed; bottom: 0px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; z-index: 50; border-top: 1px solid rgb(234, 229, 222);">
+<!-- Destination 1: My Coffees -->
+<a class="flex-1 flex flex-col items-center justify-center text-on-surface-variant py-1 hover:bg-surface-container-high active:scale-95 transition-all duration-150" href="#">
+  <div class="flex items-center justify-center w-16 h-8 rounded-full mb-1 transition-colors">
+    <span class="material-symbols-outlined text-[24px]">local_cafe</span>
+  </div>
+  <span class="text-label-md font-label-md">My Coffees</span>
+</a>
+<!-- Destination 2: Discover -->
+<a class="flex-1 flex flex-col items-center justify-center text-on-surface-variant py-1 hover:bg-surface-container-high active:scale-95 transition-all duration-150" href="#">
+  <div class="flex items-center justify-center w-16 h-8 rounded-full mb-1 transition-colors">
+    <span class="material-symbols-outlined text-[24px]">explore</span>
+  </div>
+  <span class="text-label-md font-label-md">Discover</span>
+</a>
+<!-- Destination 3: Favourites (ACTIVE DESTINATION) -->
+<a aria-current="page" class="flex-1 flex flex-col items-center justify-center text-on-secondary-fixed py-1 active:scale-95 transition-all duration-150" href="#">
+  <div class="flex items-center justify-center w-16 h-8 rounded-full mb-1 bg-secondary-fixed transition-colors">
+    <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+  </div>
+  <span class="text-label-md font-label-md font-bold text-on-surface">Favourites</span>
+</a>
+</nav>
+<!-- Interactive Unfavorite/Heart Toast Simulation -->
+<div class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-4 py-2 rounded-full shadow-lg text-body-sm font-body-sm transition-opacity duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2" id="toast">
+<span class="material-symbols-outlined text-[18px] text-secondary-container">bookmark_remove</span>
+<span id="toastMsg" class="">Capsule removed from Favourites</span>
+</div>
+<script>
+    // Quick micro-interactions for favorite toggling
+    document.querySelectorAll('[aria-label="Remove from favourites"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const icon = btn.querySelector('.material-symbols-outlined');
+        const card = btn.closest('article');
+        const title = card ? card.querySelector('h2').innerText : 'Capsule';
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        if (icon.getAttribute('style')?.includes("'FILL' 1")) {
+          // Toggle to outlined
+          icon.removeAttribute('style');
+          btn.classList.remove('text-secondary');
+          btn.classList.add('text-outline');
+          toastMsg.innerText = `Removed "${title}" from Favourites`;
+        } else {
+          // Toggle to filled
+          icon.setAttribute('style', "font-variation-settings: 'FILL' 1;");
+          btn.classList.add('text-secondary');
+          btn.classList.remove('text-outline');
+          toastMsg.innerText = `Added "${title}" to Favourites`;
+        }
+
+        toast.classList.remove('opacity-0');
+        setTimeout(() => {
+          toast.classList.add('opacity-0');
+        }, 2200);
+      });
+    });
+  </script>
+
+
+
+
+
+
+
+
+</body></html>
