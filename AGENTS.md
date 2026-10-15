@@ -1,9 +1,8 @@
-# Android Dev Container Template
+# podlog — Coffee Pod Ratings
 
-Kotlin + Jetpack Compose Android project developed inside a VS Code devcontainer
-(Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`). This repo is a
-template — real apps start via GitHub "Use this template", then get renamed
-(see "New app checklist" below).
+Kotlin + Jetpack Compose Android app for keeping a personal collection of
+Nespresso Original capsules and rating them, developed inside a VS Code
+devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
 
 ## Environment
 
@@ -16,6 +15,10 @@ template — real apps start via GitHub "Use this template", then get renamed
   the upstream script with `--no-modify-path`, on `PATH` via `ENV`).
   Dockerfile keeps SDK install and tooling in **separate RUN layers** so SDK
   layers stay cached — do not merge them.
+- App stack: Room for personal-data persistence. Coil (images) and a network
+  client (Retrofit/Ktor + kotlinx.serialization) arrive with the
+  catalogue-download phase. Add each dependency as its phase needs it and
+  record it here in the same change.
 
 ## Build, install, verify
 
@@ -28,8 +31,10 @@ template — real apps start via GitHub "Use this template", then get renamed
   `ktlint_official`) and is read by both ktlint and the editor.
 - `scripts/adb-wireless pair|connect|devices` — WiFi debugging (Android 11+).
   Pair once per phone; `connect` each session.
-- No unit tests yet. Verification = successful build + install + launch on
-  the physical phone (`adb shell am start -n <applicationId>/.MainActivity`).
+- `./gradlew test` — JVM unit tests for pure logic (rating set/change/clear,
+  sort comparators, snapshot/stable-id mapping). Add tests as that logic lands.
+- Verification of user-visible work = successful build + install + launch on the
+  physical phone (`adb shell am start -n <applicationId>/.MainActivity`).
 - Kotlin IntelliSense (JetBrains `kotlin-server`) needs a successful Gradle
   import first. If completion is dead, check Output → Gradle channel for
   import errors before blaming the editor.
@@ -51,6 +56,16 @@ template — real apps start via GitHub "Use this template", then get renamed
 - minSdk is 26 — check API-level compatibility when using newer Android APIs.
 - Always invoke Gradle via `./gradlew` (wrapper), never a global `gradle`.
 
+## App scope: coffee pod ratings
+
+- Product requirements and scope boundaries live in `docs/PRODUCT_SPEC.md`;
+  implementation order and completion criteria live in `docs/ROADMAP.md`.
+  Read the relevant document before planning or implementing app features.
+- Follow `docs/ROADMAP.md` for the implementation sequence. Prefer the smallest
+  useful increment and do not implement later-phase features prematurely.
+- After finishing any roadmap phase, run the `phase-verification` skill before
+  declaring the phase complete.
+
 ## Working agreements
 
 - After code changes, verify with `./gradlew assembleDebug` (+ install on the
@@ -59,22 +74,15 @@ template — real apps start via GitHub "Use this template", then get renamed
   Explore subagent instead of dumping files into context.
 - Keep this file current: when you add a dependency, change the architecture,
   or learn a new gotcha, update the relevant section in the same change.
+- Explain before executing when a request is ambiguous; prefer `plan` mode
+  for multi-file changes the user hasn't explicitly approved.
 
-## New app checklist (after "Use this template")
-
-1. `scripts/rename-app <new.application.id> <"App Display Name">` — rewrites
-   namespace, applicationId, package dirs (via `git mv`), theme, app_name,
-   rootProject.name. Requires a clean git tree. Then update README.md.
-2. `applicationId` is the on-phone identity: two apps sharing one overwrite
-   each other. Uninstall the old sample id if needed:
-   `adb uninstall <old.application.id>`.
+with `adb uninstall <old.application.id>` when renaming an installed app.
 
 ## Conventions
 
 - Keep README.md human-focused (setup, phone pairing, daily commands).
   Agent/operational detail lives here, not there.
-- Explain before executing when a request is ambiguous; prefer `plan` mode
-  for multi-file changes the user hasn't explicitly approved.
 - Never commit secrets (`google-services.json` is gitignored for per-app
   Firebase configs). Never bake credentials into the Docker image.
 - Commit messages: short, imperative, no trailing period.

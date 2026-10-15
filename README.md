@@ -1,12 +1,13 @@
-# Android Hobby Template
+# podlog
 
-A ready-to-use starting point for Android hobby projects. Everything you
-need to build apps lives in a Docker container, so you never install Java
-or the Android SDK on your own machine. You write code in VS Code and run
-the app on your physical phone over WiFi.
+A personal coffee-capsule log: keep a collection of Nespresso Original capsules,
+rate them 1–5 stars, and mark favourites. Everything needed to build runs in a
+Docker container, so you never install Java or the Android SDK on your own
+machine. You write code in VS Code and run the app on your physical phone over
+WiFi.
 
-Stack: Kotlin + Jetpack Compose, JDK 17, Android API 34, Gradle Wrapper.
-The included `app` module is a minimal Hello World to prove the setup works.
+Stack: Kotlin + Jetpack Compose, JDK 17, Android API 34/35, Gradle Wrapper.
+Personal data is stored on-device with Room.
 
 ## What you need
 
@@ -37,18 +38,21 @@ The included `app` module is a minimal Hello World to prove the setup works.
    ```bash
    ./gradlew installDebug
    ```
-   The HelloWorld app shows up on your phone. Open it and you'll see
-   "Hello Android!".
 
-
-## Start a new app from this template
+## Daily commands
 
 ```bash
-git clone <this-repo> MyNewApp
-code MyNewApp
+./gradlew assembleDebug   # build the debug APK
+./gradlew installDebug    # install on the connected phone
+./gradlew test            # run JVM unit tests
+./gradlew ktlintFormat    # autoformat Kotlin
+./gradlew ktlintCheck     # verify formatting
 ```
 
-Reopen in container, connect your phone, and build. That's it.
+## Project docs
+
+- [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md) — what the app does and its scope.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — implementation order and completion criteria.
 
 ## Code formatting
 
