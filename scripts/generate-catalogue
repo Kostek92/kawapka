@@ -1,0 +1,366 @@
+#!/usr/bin/env perl
+#
+# Generate the bundled Nespresso Original catalogue snapshot.
+#
+# Fetches the Polish Nespresso Original capsule listing, keeps only individual
+# coffee capsules, downloads and downsizes their product images, and writes:
+#
+#   app/src/main/java/com/application/podlog/data/catalogue/GeneratedCatalogue.kt
+#   app/src/main/res/drawable-nodpi/catalogue_*.png
+#
+# Each coffee keeps its short description plus the headline, intensity, and
+# aroma tags used by the catalogue tiles and a future detail view.
+#
+# Run from anywhere: scripts/generate-catalogue
+#
+# The app never talks to the network; this script is the only network step and
+# is run manually when the catalogue should be refreshed. Re-running it is safe:
+# it replaces the previous generated snapshot and removes stale generated images.
+#
+# Requires perl (JSON::PP is part of core Perl) and curl, both present in the
+# dev container. Image resizing uses the project's JDK via ResizeCatalogueImages.java.
+
+use v5.16;
+use strict;
+use warnings;
+use utf8;
+
+use Cwd qw(abs_path);
+use Encode qw(decode encode);
+use File::Basename qw(dirname);
+use File::Copy qw(copy);
+use File::Path qw(make_path);
+use File::Temp qw(tempdir);
+use FindBin qw($RealBin);
+use JSON::PP qw(decode_json);
+use POSIX qw(strftime);
+
+my $SOURCE_URL = 'https://www.nespresso.com/pl/pl/order/capsules/original';
+my $IMAGE_BASE = 'https://www.nespresso.com';
+my $USER_AGENT =
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36';
+my $IMAGE_MAX_PX    = 512;
+my $DESCRIPTION_MAX = 100;
+my $INTENSITY_MAX   = 13;
+my $SKU_PATTERN     = qr/^\d{4}\.\d{2}$/;
+
+my $repo_root = dirname( abs_path($RealBin) );
+binmode( STDOUT, ':encoding(UTF-8)' );
+binmode( STDERR, ':encoding(UTF-8)' );
+my $kotlin_path =
+    "$repo_root/app/src/main/java/com/application/podlog/data/catalogue/GeneratedCatalogue.kt";
+my $images_dir = "$repo_root/app/src/main/res/drawable-nodpi";
+my $resizer    = "$RealBin/ResizeCatalogueImages.java";
+
+die "Not in the podlog repo: $repo_root/app is missing\n"
+    unless -d "$repo_root/app";
+die "Missing image resizer: $resizer\n" unless -f $resizer;
+
+my $work = tempdir( 'podlog-catalogue-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $html_file = "$work/catalogue.html";
+
+say "Fetching $SOURCE_URL";
+fetch($SOURCE_URL, $html_file)
+    or die "Could not download the catalogue page (curl failed)\n";
+
+open( my $html_fh, '<:raw', $html_file ) or die "Cannot read $html_file: $!\n";
+my $html = do { local $/; <$html_fh> };
+close $html_fh;
+$html = decode( 'UTF-8', $html );
+
+my ($search_json) =
+    $html =~ m{<script[^>]*\bid=["']search-bar["'][^>]*>(.*?)</script>}s;
+die "Could not find the search-bar product data on the page. "
+    . "The Nespresso site layout may have changed.\n"
+    unless defined $search_json;
+
+my $products = eval { decode_json( encode( 'UTF-8', $search_json ) ) };
+die "Could not parse the product data: $@\n"
+    if $@ || ref($products) ne 'ARRAY';
+
+my @original = grep {
+    ( $_->{type}         // '' ) eq 'capsule'
+        && ( $_->{rootCategory} // '' ) eq 'capsules_original'
+} @$products;
+
+my %seen_sku;
+my @coffees;
+for my $product (@original) {
+    my $sku = $product->{sku} // '';
+    next unless $sku =~ $SKU_PATTERN;
+    next if $seen_sku{$sku}++;
+    push @coffees, $product;
+}
+@coffees = sort { lc( clean_name( $a->{name} ) ) cmp lc( clean_name( $b->{name} ) ) }
+    @coffees;
+
+my $skipped = @original - @coffees;
+say "Found " . scalar(@original) . " Original capsule entries; "
+    . "selected " . scalar(@coffees) . " individual coffees "
+    . "($skipped sets/bundles/accessories excluded).";
+die "No individual coffees found; refusing to overwrite the snapshot.\n"
+    unless @coffees >= 20;
+
+my $with_headline  = grep { length headline($_) } @coffees;
+my $with_intensity = grep { defined intensity($_) } @coffees;
+my $with_aromatics = grep { scalar aromatics($_) } @coffees;
+say "Tag data: $with_headline/" . scalar(@coffees) . " headlines, "
+    . "$with_intensity/" . scalar(@coffees) . " intensities, "
+    . "$with_aromatics/" . scalar(@coffees) . " aroma lists.";
+
+my %image_for;
+my $download_dir = "$work/downloads";
+make_path($download_dir);
+
+for my $product (@coffees) {
+    my $sku          = $product->{sku};
+    my $name         = clean_name( $product->{name} );
+    my $resource     = resource_name($product);
+    my $image_path   = $product->{image} // '';
+    next unless length $image_path;
+
+    my $url = image_url($image_path);
+    my $ext = image_extension($image_path);
+    my $dest = "$download_dir/$resource.$ext";
+    if ( fetch( $url, $dest ) ) {
+        $image_for{$sku} = $resource;
+    }
+    else {
+        warn "WARNING: could not download image for $sku ($name)\n";
+    }
+}
+
+say "Downloaded " . scalar( keys %image_for ) . " of " . scalar(@coffees) . " images.";
+
+my $resized_dir = "$work/resized";
+make_path($resized_dir);
+if ( keys %image_for ) {
+    my $status = system(
+        'java', '-Djava.awt.headless=true', $resizer,
+        $download_dir, $resized_dir, $IMAGE_MAX_PX,
+    );
+    die "Image resizing failed (exit " . ( $status >> 8 ) . ")\n" if $status != 0;
+
+    for my $sku ( keys %image_for ) {
+        my $resized = "$resized_dir/$image_for{$sku}.png";
+        next if -f $resized;
+        warn "WARNING: could not resize image for $sku\n";
+        delete $image_for{$sku};
+    }
+}
+
+my $kotlin = render_kotlin( \@coffees, \%image_for );
+
+make_path( dirname($kotlin_path) );
+open( my $kotlin_fh, '>:encoding(UTF-8)', $kotlin_path )
+    or die "Cannot write $kotlin_path: $!\n";
+print {$kotlin_fh} $kotlin;
+close $kotlin_fh;
+
+make_path($images_dir);
+opendir( my $dir_fh, $images_dir ) or die "Cannot read $images_dir: $!\n";
+my @stale = grep { /^catalogue_.*\.(?:png|jpe?g|webp)$/i } readdir($dir_fh);
+closedir $dir_fh;
+unlink map { "$images_dir/$_" } @stale;
+
+my $written_images = 0;
+for my $resource ( sort values %image_for ) {
+    my $src = "$resized_dir/$resource.png";
+    next unless -f $src;
+    copy( $src, "$images_dir/$resource.png" )
+        or die "Cannot copy $src to $images_dir: $!\n";
+    $written_images++;
+}
+
+say "Wrote $kotlin_path";
+say "Wrote $written_images images to $images_dir";
+say '';
+say sprintf '%-9s %s', 'SKU', 'Coffee';
+for my $product (@coffees) {
+    my $image = exists $image_for{ $product->{sku} } ? '' : '  [no image]';
+    say sprintf '%-9s %s%s', $product->{sku}, clean_name( $product->{name} ), $image;
+}
+
+sub fetch {
+    my ( $url, $dest ) = @_;
+    system(
+        'curl', '-fsSL',
+        '--retry', '3',
+        '--connect-timeout', '20',
+        '--max-time', '120',
+        '-A', $USER_AGENT,
+        '-o', $dest,
+        $url,
+    );
+    return $? == 0 && -s $dest;
+}
+
+sub image_url {
+    my ($path) = @_;
+    return $path if $path =~ m{^https?://};
+    return $IMAGE_BASE . ( $path =~ m{^/} ? '' : '/' ) . $path;
+}
+
+sub image_extension {
+    my ($path) = @_;
+    my ($ext) = $path =~ /\.([A-Za-z0-9]+)(?:[?#].*)?$/;
+    $ext = lc( $ext // 'png' );
+    return $ext =~ /\A(?:png|jpe?g|webp)\z/ ? $ext : 'png';
+}
+
+sub clean_text {
+    my ($text) = @_;
+    return '' unless defined $text;
+    $text =~ s{<[^>]+>}{ }g;
+    $text =~ s/[\x{200B}\x{200C}\x{200D}\x{FEFF}\x{00AD}]//g;
+    $text =~ s/[[:space:]]+/ /g;
+    $text =~ s/\A\s+|\s+\z//g;
+    return $text;
+}
+
+sub clean_name {
+    my ($name) = @_;
+    my $clean = clean_text($name);
+    $clean =~ s/\s*\(\s*\d+\s*(?:\/\s*\d+\s*)?ml\s*\)\s*\z//i;
+    $clean =~ s/\s+\z//;
+    return $clean;
+}
+
+sub short_description {
+    my ($product) = @_;
+    my $text = clean_text( $product->{aromaticProfileDescription} );
+    $text = clean_text( $product->{description} ) unless length $text;
+    return shorten( $text, $DESCRIPTION_MAX );
+}
+
+sub capsule_properties {
+    my ($product) = @_;
+    my $properties = $product->{capsuleProperties};
+    return {} unless defined $properties;
+    return $properties if ref($properties) eq 'HASH';
+
+    my $decoded = eval { decode_json( encode( 'UTF-8', $properties ) ) };
+    return ref($decoded) eq 'HASH' ? $decoded : {};
+}
+
+sub headline {
+    my ($product) = @_;
+    return clean_text( $product->{headline} );
+}
+
+sub intensity {
+    my ($product) = @_;
+    my $intensity = capsule_properties($product)->{intensity};
+    return undef unless defined $intensity;
+    return undef unless $intensity =~ /\A\d+\z/;
+    return undef if $intensity < 1 || $intensity > $INTENSITY_MAX;
+    return int $intensity;
+}
+
+sub aromatics {
+    my ($product) = @_;
+    my $raw = $product->{capsuleProductAromatics};
+    return () unless defined $raw;
+
+    my @tags = map { clean_text($_) } split /,/, $raw;
+    return grep { length } @tags;
+}
+
+sub shorten {
+    my ( $text, $limit ) = @_;
+    return $text if length($text) <= $limit;
+
+    my $cut = substr( $text, 0, $limit );
+    $cut =~ s/\s+\S*\z//;
+    $cut =~ s/[\s,;:.!?\-–—]+\z//;
+    $cut = $text unless length $cut;
+    return $cut . '…';
+}
+
+sub resource_name {
+    my ($product) = @_;
+    my $slug = $product->{PDPurl} // '';
+    $slug =~ s{[?#].*}{};
+    $slug =~ s{.*/}{};
+    $slug = lc $slug;
+    $slug =~ s/[^a-z0-9]+/_/g;
+    $slug =~ s/\A_+|_+\z//g;
+    $slug = 'coffee' if $slug eq '';
+    $slug = substr( $slug, 0, 48 );
+    $slug =~ s/_+\z//;
+
+    my $sku = $product->{sku} // 'unknown';
+    $sku =~ s/[^0-9]/_/g;
+
+    return "catalogue_${slug}_${sku}";
+}
+
+sub kotlin_literal {
+    my ($text) = @_;
+    $text = defined $text ? $text : '';
+    $text =~ s/\\/\\\\/g;
+    $text =~ s/"/\\"/g;
+    $text =~ s/\$/\\\$/g;
+    $text =~ s/\r//g;
+    $text =~ s/\n/\\n/g;
+    return qq{"$text"};
+}
+
+sub render_kotlin {
+    my ( $products, $images ) = @_;
+    my $date = strftime( '%Y-%m-%d', localtime );
+
+    my $out = <<"HEADER";
+package com.application.podlog.data.catalogue
+
+import com.application.podlog.R
+
+/**
+ * Snapshot of the Nespresso Original capsule catalogue.
+ *
+ * Generated by `scripts/generate-catalogue` from
+ * $SOURCE_URL on $date.
+ * Do not edit by hand; re-run the script instead. The snapshot is committed to
+ * the repo, so the app makes no network requests.
+ */
+object GeneratedCatalogue {
+    val coffees: List<CatalogueCoffee> =
+        listOf(
+HEADER
+
+    for my $product ( @$products ) {
+        my $sku       = $product->{sku};
+        my $name      = clean_name( $product->{name} );
+        my $headline  = headline($product);
+        my $intensity = intensity($product);
+        my @aromatics = aromatics($product);
+        my $short     = short_description($product);
+        my $resource  = $images->{$sku};
+
+        my $headline_literal =
+            length $headline ? kotlin_literal($headline) : 'null';
+        my $intensity_literal = defined $intensity ? $intensity : 'null';
+        my $aromatics_literal =
+            @aromatics
+            ? 'listOf(' . join( ', ', map { kotlin_literal($_) } @aromatics ) . ')'
+            : 'emptyList()';
+        my $short_literal = length $short ? kotlin_literal($short) : 'null';
+        my $image_literal =
+            defined $resource
+            ? "R.drawable.$resource"
+            : 'null';
+
+        $out .= "            CatalogueCoffee(\n";
+        $out .= '                id = ' . kotlin_literal($sku) . ",\n";
+        $out .= '                name = ' . kotlin_literal($name) . ",\n";
+        $out .= '                headline = ' . $headline_literal . ",\n";
+        $out .= "                intensity = $intensity_literal,\n";
+        $out .= "                aromatics = $aromatics_literal,\n";
+        $out .= "                shortDescription = $short_literal,\n";
+        $out .= "                imageRes = $image_literal,\n";
+        $out .= "            ),\n";
+    }
+
+    $out .= "        )\n}\n";
+    return $out;
+}

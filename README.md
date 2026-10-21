@@ -49,6 +49,20 @@ Personal data is stored on-device with Room.
 ./gradlew ktlintCheck     # verify formatting
 ```
 
+## Refresh the catalogue
+
+The app bundles a snapshot of the Nespresso Original coffee catalogue, so it
+works without an internet connection. To pick up new or removed coffees, run
+inside the container while online:
+
+```bash
+scripts/generate-catalogue
+```
+
+This replaces the generated catalogue Kotlin file and its bundled product
+images. Check `git diff` to confirm the changes look right, then rebuild and
+install the app.
+
 ## Project docs
 
 - [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md) — what the app does and its scope.

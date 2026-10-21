@@ -15,14 +15,19 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   the upstream script with `--no-modify-path`, on `PATH` via `ENV`).
   Dockerfile keeps SDK install and tooling in **separate RUN layers** so SDK
   layers stay cached — do not merge them.
-- App stack: Room for personal-data persistence. Coil (images) and a network
-  client (Retrofit/Ktor + kotlinx.serialization) arrive with the
-  catalogue-download phase. Add each dependency as its phase needs it and
-  record it here in the same change.
+- App stack: Room for personal-data persistence. The app has no network client:
+  catalogue data and images are bundled in the APK. Add future dependencies
+  only as their phase needs them and record them here in the same change.
 - Catalogue browsing sits behind `CatalogueRepository`. Catalogue models carry
   no personal state; collection membership, ratings, and favourites will key
   off the stable `CatalogueCoffee.id`. Screens use `lifecycle-viewmodel-compose`
   and `lifecycle-runtime-compose` for Route/ViewModel state collection.
+- `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the
+  Nespresso Original listing, filtering to individual capsules, resizing images
+  to 512 px, and writing `data/catalogue/GeneratedCatalogue.kt` plus
+  `res/drawable-nodpi/catalogue_*.png`. The generated files are committed and
+  must not be hand-edited. Re-run the script to pick up catalogue changes.
+  `DummyCatalogue` stays as the test/preview fixture.
 
 ## Build, install, verify
 
@@ -35,6 +40,10 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   `ktlint_official`) and is read by both ktlint and the editor.
 - `scripts/adb-wireless pair|connect|devices` — WiFi debugging (Android 11+).
   Pair once per phone; `connect` each session.
+- `scripts/generate-catalogue` — refresh the bundled catalogue snapshot. Run it
+  in the container (needs network, `curl`, Perl's core `JSON::PP`, and the JDK);
+  it rewrites the generated Kotlin file and images. Inspect `git diff` afterwards;
+  the script intentionally leaves the app code untouched.
 - `./gradlew test` — JVM unit tests for pure logic (rating set/change/clear,
   sort comparators, snapshot/stable-id mapping). Add tests as that logic lands.
 - Verification of user-visible work = successful build + install + launch on the
