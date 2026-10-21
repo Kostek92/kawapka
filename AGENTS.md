@@ -19,6 +19,10 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   client (Retrofit/Ktor + kotlinx.serialization) arrive with the
   catalogue-download phase. Add each dependency as its phase needs it and
   record it here in the same change.
+- Catalogue browsing sits behind `CatalogueRepository`. Catalogue models carry
+  no personal state; collection membership, ratings, and favourites will key
+  off the stable `CatalogueCoffee.id`. Screens use `lifecycle-viewmodel-compose`
+  and `lifecycle-runtime-compose` for Route/ViewModel state collection.
 
 ## Build, install, verify
 
