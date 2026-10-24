@@ -1,7 +1,7 @@
-package com.application.podlog.ui.catalogue
+package com.application.kawapka.ui.catalogue
 
-import com.application.podlog.data.catalogue.CatalogueCoffee
-import com.application.podlog.data.catalogue.CatalogueRepository
+import com.application.kawapka.data.catalogue.CatalogueCoffee
+import com.application.kawapka.data.catalogue.CatalogueRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

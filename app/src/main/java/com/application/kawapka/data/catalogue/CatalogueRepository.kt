@@ -1,4 +1,4 @@
-package com.application.podlog.data.catalogue
+package com.application.kawapka.data.catalogue
 
 /**
  * Source of the shared coffee catalogue.

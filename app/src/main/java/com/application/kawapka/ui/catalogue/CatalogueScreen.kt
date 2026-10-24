@@ -1,4 +1,4 @@
-package com.application.podlog.ui.catalogue
+package com.application.kawapka.ui.catalogue
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -32,10 +32,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.application.podlog.R
-import com.application.podlog.data.catalogue.CatalogueCoffee
-import com.application.podlog.data.catalogue.DummyCatalogue
-import com.application.podlog.ui.theme.PodlogTheme
+import com.application.kawapka.R
+import com.application.kawapka.data.catalogue.CatalogueCoffee
+import com.application.kawapka.data.catalogue.DummyCatalogue
+import com.application.kawapka.ui.theme.KawapkaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -183,7 +183,7 @@ private fun CatalogueEmptyState(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun CatalogueScreenPreview() {
-    PodlogTheme {
+    KawapkaTheme {
         CatalogueScreen(coffees = DummyCatalogue.coffees)
     }
 }
@@ -191,7 +191,7 @@ private fun CatalogueScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun CatalogueScreenEmptyPreview() {
-    PodlogTheme {
+    KawapkaTheme {
         CatalogueScreen(coffees = emptyList())
     }
 }

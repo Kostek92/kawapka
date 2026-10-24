@@ -1,6 +1,6 @@
-package com.application.podlog.data.catalogue
+package com.application.kawapka.data.catalogue
 
-import com.application.podlog.R
+import com.application.kawapka.R
 
 /**
  * Hand-written Phase 1 fixture.

@@ -1,4 +1,4 @@
-package com.application.podlog
+package com.application.kawapka
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,7 +10,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PodlogApp()
+            KawapkaApp()
         }
     }
 }

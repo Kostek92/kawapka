@@ -1,8 +1,8 @@
-package com.application.podlog.ui.catalogue
+package com.application.kawapka.ui.catalogue
 
 import androidx.lifecycle.ViewModel
-import com.application.podlog.data.catalogue.CatalogueCoffee
-import com.application.podlog.data.catalogue.CatalogueRepository
+import com.application.kawapka.data.catalogue.CatalogueCoffee
+import com.application.kawapka.data.catalogue.CatalogueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

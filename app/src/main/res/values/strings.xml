@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Podlog</string>
+    <string name="app_name">Kawapka</string>
     <string name="catalogue_title">Catalogue</string>
     <string name="catalogue_empty">No coffees in the catalogue yet.</string>
     <string name="catalogue_intensity">Intensity: %1$d/%2$d</string>

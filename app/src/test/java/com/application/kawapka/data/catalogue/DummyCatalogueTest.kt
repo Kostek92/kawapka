@@ -1,4 +1,4 @@
-package com.application.podlog.data.catalogue
+package com.application.kawapka.data.catalogue
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

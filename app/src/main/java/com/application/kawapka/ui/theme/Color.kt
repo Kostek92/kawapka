@@ -1,4 +1,4 @@
-package com.application.podlog.ui.theme
+package com.application.kawapka.ui.theme
 
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme

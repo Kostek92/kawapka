@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Podlog"
+rootProject.name = "Kawapka"
 include(":app")

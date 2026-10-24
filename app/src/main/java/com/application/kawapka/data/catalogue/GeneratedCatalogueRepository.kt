@@ -1,4 +1,4 @@
-package com.application.podlog.data.catalogue
+package com.application.kawapka.data.catalogue
 
 /**
  * Catalogue repository backed by the committed generated snapshot.

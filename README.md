@@ -1,4 +1,4 @@
-# podlog
+# Kawapka
 
 A personal coffee-capsule log: keep a collection of Nespresso Original capsules,
 rate them 1–5 stars, and mark favourites. Everything needed to build runs in a

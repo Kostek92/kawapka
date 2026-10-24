@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.application.podlog"
+    namespace = "com.application.kawapka"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.application.podlog"
+        applicationId = "com.application.kawapka"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

@@ -1,4 +1,4 @@
-# podlog — Coffee Pod Ratings
+# Kawapka — Coffee Pod Ratings
 
 Kotlin + Jetpack Compose Android app for keeping a personal collection of
 Nespresso Original capsules and rating them, developed inside a VS Code

@@ -5,7 +5,7 @@
 # Fetches the Polish Nespresso Original capsule listing, keeps only individual
 # coffee capsules, downloads and downsizes their product images, and writes:
 #
-#   app/src/main/java/com/application/podlog/data/catalogue/GeneratedCatalogue.kt
+#   app/src/main/java/com/application/kawapka/data/catalogue/GeneratedCatalogue.kt
 #   app/src/main/res/drawable-nodpi/catalogue_*.png
 #
 # Each coffee keeps its short description plus the headline, intensity, and
@@ -48,15 +48,15 @@ my $repo_root = dirname( abs_path($RealBin) );
 binmode( STDOUT, ':encoding(UTF-8)' );
 binmode( STDERR, ':encoding(UTF-8)' );
 my $kotlin_path =
-    "$repo_root/app/src/main/java/com/application/podlog/data/catalogue/GeneratedCatalogue.kt";
+    "$repo_root/app/src/main/java/com/application/kawapka/data/catalogue/GeneratedCatalogue.kt";
 my $images_dir = "$repo_root/app/src/main/res/drawable-nodpi";
 my $resizer    = "$RealBin/ResizeCatalogueImages.java";
 
-die "Not in the podlog repo: $repo_root/app is missing\n"
+die "Not in the Kawapka repo: $repo_root/app is missing\n"
     unless -d "$repo_root/app";
 die "Missing image resizer: $resizer\n" unless -f $resizer;
 
-my $work = tempdir( 'podlog-catalogue-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $work = tempdir( 'kawapka-catalogue-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
 my $html_file = "$work/catalogue.html";
 
 say "Fetching $SOURCE_URL";
@@ -311,9 +311,9 @@ sub render_kotlin {
     my $date = strftime( '%Y-%m-%d', localtime );
 
     my $out = <<"HEADER";
-package com.application.podlog.data.catalogue
+package com.application.kawapka.data.catalogue
 
-import com.application.podlog.R
+import com.application.kawapka.R
 
 /**
  * Snapshot of the Nespresso Original capsule catalogue.
