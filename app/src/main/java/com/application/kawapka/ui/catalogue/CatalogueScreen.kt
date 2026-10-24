@@ -1,46 +1,49 @@
 package com.application.kawapka.ui.catalogue
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.application.kawapka.R
-import com.application.kawapka.data.catalogue.CatalogueCoffee
 import com.application.kawapka.data.catalogue.DummyCatalogue
 import com.application.kawapka.ui.theme.KawapkaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogueScreen(
-    coffees: List<CatalogueCoffee>,
+    items: List<CatalogueItemUiState>,
+    onAdd: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -49,7 +52,7 @@ fun CatalogueScreen(
             TopAppBar(title = { Text(text = stringResource(R.string.catalogue_title)) })
         },
     ) { innerPadding ->
-        if (coffees.isEmpty()) {
+        if (items.isEmpty()) {
             CatalogueEmptyState(
                 modifier =
                     Modifier
@@ -58,7 +61,8 @@ fun CatalogueScreen(
             )
         } else {
             CatalogueGrid(
-                coffees = coffees,
+                items = items,
+                onAdd = onAdd,
                 modifier =
                     Modifier
                         .padding(innerPadding)
@@ -70,7 +74,8 @@ fun CatalogueScreen(
 
 @Composable
 private fun CatalogueGrid(
-    coffees: List<CatalogueCoffee>,
+    items: List<CatalogueItemUiState>,
+    onAdd: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
@@ -80,9 +85,10 @@ private fun CatalogueGrid(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(items = coffees, key = { coffee -> coffee.id }) { coffee ->
+        items(items = items, key = { item -> item.coffee.id }) { item ->
             CatalogueCard(
-                coffee = coffee,
+                item = item,
+                onAdd = onAdd,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -91,71 +97,82 @@ private fun CatalogueGrid(
 
 @Composable
 private fun CatalogueCard(
-    coffee: CatalogueCoffee,
+    item: CatalogueItemUiState,
+    onAdd: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    OutlinedCard(
+    CoffeeCard(
+        coffee = item.coffee,
         modifier = modifier,
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1.25f),
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    painter = painterResource(coffee.imageRes ?: R.drawable.capsule_placeholder),
-                    contentDescription = null,
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(8.dp),
-                    contentScale = ContentScale.Fit,
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = coffee.name,
-                style = MaterialTheme.typography.titleMedium,
-                minLines = 2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            // Reserve lines even without tag data so every card aligns.
-            val headline = coffee.headline?.takeIf { it.isNotBlank() } ?: "\u00A0"
-            Text(
-                text = headline,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                minLines = 2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            val intensity = coffee.intensity
-            val intensityText =
-                if (intensity == null) {
-                    "\u00A0"
-                } else {
-                    stringResource(
-                        R.string.catalogue_intensity,
-                        intensity,
-                        CatalogueCoffee.MAX_INTENSITY,
-                    )
-                }
-            Text(
-                text = intensityText,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                minLines = 1,
-                maxLines = 1,
+        if (item.isInCollection) {
+            AddedButton()
+        } else {
+            AddButton(
+                coffeeId = item.coffee.id,
+                onAdd = onAdd,
             )
         }
+    }
+}
+
+@Composable
+private fun AddButton(
+    coffeeId: String,
+    onAdd: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedButton(
+        onClick = { onAdd(coffeeId) },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(36.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.secondary),
+        contentPadding = PaddingValues(horizontal = 12.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = stringResource(R.string.catalogue_add),
+            style = MaterialTheme.typography.labelMedium,
+        )
+    }
+}
+
+/** Non-interactive indicator; removal happens from the personal collection. */
+@Composable
+private fun AddedButton(modifier: Modifier = Modifier) {
+    FilledTonalButton(
+        onClick = {},
+        enabled = false,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(36.dp),
+        colors =
+            ButtonDefaults.filledTonalButtonColors(
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                disabledContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        contentPadding = PaddingValues(horizontal = 12.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.Check,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.secondary,
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = stringResource(R.string.catalogue_added),
+            style = MaterialTheme.typography.labelMedium,
+        )
     }
 }
 
@@ -184,7 +201,13 @@ private fun CatalogueEmptyState(modifier: Modifier = Modifier) {
 @Composable
 private fun CatalogueScreenPreview() {
     KawapkaTheme {
-        CatalogueScreen(coffees = DummyCatalogue.coffees)
+        CatalogueScreen(
+            items =
+                DummyCatalogue.coffees.mapIndexed { index, coffee ->
+                    CatalogueItemUiState(coffee = coffee, isInCollection = index % 3 == 0)
+                },
+            onAdd = {},
+        )
     }
 }
 
@@ -192,6 +215,6 @@ private fun CatalogueScreenPreview() {
 @Composable
 private fun CatalogueScreenEmptyPreview() {
     KawapkaTheme {
-        CatalogueScreen(coffees = emptyList())
+        CatalogueScreen(items = emptyList(), onAdd = {})
     }
 }

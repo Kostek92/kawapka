@@ -9,8 +9,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val app = application as KawapkaApplication
         setContent {
-            KawapkaApp()
+            KawapkaApp(
+                catalogueRepository = app.catalogueRepository,
+                collectionRepository = app.collectionRepository,
+            )
         }
     }
 }

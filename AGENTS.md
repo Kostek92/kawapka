@@ -15,15 +15,20 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   the upstream script with `--no-modify-path`, on `PATH` via `ENV`).
   Dockerfile keeps SDK install and tooling in **separate RUN layers** so SDK
   layers stay cached — do not merge them.
-- App stack: Room for personal-data persistence. The app has no network client:
-  catalogue data and images are bundled in the APK. Add future dependencies
-  only as their phase needs them and record them here in the same change.
+- App stack: Room 2.6.1 (via KSP 2.0.20-1.0.25) for personal-data
+  persistence in `kawapka.db`. Room schemas are exported to `app/schemas/` and
+  committed; bump `KawapkaDatabase.version` with a migration rather than losing
+  user data. The app has no network client: catalogue data and images are
+  bundled in the APK. Add future dependencies only as their phase needs them
+  and record them here in the same change.
 - Catalogue browsing sits behind `CatalogueRepository`. Production uses
   `GeneratedCatalogueRepository`; `DummyCatalogue` stays as the preview/test
-  fixture. Catalogue models carry no personal state; collection membership,
-  ratings, and favourites will key off the stable `CatalogueCoffee.id`. Screens
-  use `lifecycle-viewmodel-compose` and `lifecycle-runtime-compose` for
-  Route/ViewModel state collection.
+  fixture. Catalogue models carry no personal state. Personal state sits behind
+  `CollectionRepository` (Room-backed in production) and keys off the stable
+  `CatalogueCoffee.id`; collection rows store only the catalogue id and date
+  added, never a copy of catalogue data. `KawapkaApplication` owns the database
+  and repository graph. Screens use `lifecycle-viewmodel-compose` and
+  `lifecycle-runtime-compose` for Route/ViewModel state collection.
 - `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the
   Nespresso Original listing, filtering to individual capsules, resizing images
   to 512 px, and writing `data/catalogue/GeneratedCatalogue.kt` plus
