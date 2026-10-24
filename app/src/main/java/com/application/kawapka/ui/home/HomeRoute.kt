@@ -2,6 +2,9 @@ package com.application.kawapka.ui.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -9,7 +12,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.application.kawapka.data.catalogue.CatalogueRepository
 import com.application.kawapka.data.collection.CollectionRepository
-import com.application.kawapka.ui.catalogue.CatalogueScreen
 
 @Composable
 fun HomeRoute(
@@ -25,9 +27,14 @@ fun HomeRoute(
                 },
         )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    CatalogueScreen(
-        items = uiState.catalogue,
-        onAdd = viewModel::addToCollection,
+    var selectedTab by rememberSaveable { mutableStateOf(HomeTab.Catalogue) }
+
+    HomeScreen(
+        selectedTab = selectedTab,
+        uiState = uiState,
+        onTabSelected = { tab -> selectedTab = tab },
+        onAddToCollection = viewModel::addToCollection,
+        onRemoveFromCollection = viewModel::removeFromCollection,
         modifier = modifier,
     )
 }

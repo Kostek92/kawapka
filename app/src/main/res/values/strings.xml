@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Kawapka</string>
-    <string name="catalogue_title">Catalogue</string>
     <string name="catalogue_empty">No coffees in the catalogue yet.</string>
     <string name="catalogue_intensity">Intensity: %1$d/%2$d</string>
     <string name="catalogue_add">Add</string>
     <string name="catalogue_added">Added</string>
+    <string name="nav_catalogue">Catalogue</string>
+    <string name="nav_collection">My Coffees</string>
+    <string name="collection_remove">Remove</string>
+    <string name="collection_empty_title">Your collection is empty</string>
+    <string name="collection_empty_body">Add coffees from the catalogue to keep track of the ones you have.</string>
+    <string name="collection_browse_catalogue">Browse catalogue</string>
 </resources>

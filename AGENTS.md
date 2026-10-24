@@ -27,8 +27,10 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   `CollectionRepository` (Room-backed in production) and keys off the stable
   `CatalogueCoffee.id`; collection rows store only the catalogue id and date
   added, never a copy of catalogue data. `KawapkaApplication` owns the database
-  and repository graph. Screens use `lifecycle-viewmodel-compose` and
-  `lifecycle-runtime-compose` for Route/ViewModel state collection.
+  and repository graph. `HomeRoute`/`HomeScreen` host the two top-level tabs
+  (`Catalogue`, `My Coffees`) and save the selected tab with Compose state.
+  Screens use `lifecycle-viewmodel-compose` and `lifecycle-runtime-compose` for
+  Route/ViewModel state collection.
 - `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the
   Nespresso Original listing, filtering to individual capsules, resizing images
   to 512 px, and writing `data/catalogue/GeneratedCatalogue.kt` plus
@@ -52,7 +54,8 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   it rewrites the generated Kotlin file and images. Inspect `git diff` afterwards;
   the script intentionally leaves the app code untouched.
 - `./gradlew test` — JVM unit tests for pure logic (rating set/change/clear,
-  sort comparators, snapshot/stable-id mapping). Add tests as that logic lands.
+  sort comparators, snapshot/stable-id mapping, collection membership and
+  date-added ordering). Add tests as that logic lands.
 - Verification of user-visible work = successful build + install + launch on the
   physical phone (`adb shell am start -n <applicationId>/.MainActivity`).
 - Kotlin IntelliSense (JetBrains `kotlin-server`) needs a successful Gradle

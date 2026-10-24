@@ -19,14 +19,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,36 +36,20 @@ import com.application.kawapka.R
 import com.application.kawapka.data.catalogue.DummyCatalogue
 import com.application.kawapka.ui.theme.KawapkaTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogueScreen(
     items: List<CatalogueItemUiState>,
     onAdd: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(title = { Text(text = stringResource(R.string.catalogue_title)) })
-        },
-    ) { innerPadding ->
-        if (items.isEmpty()) {
-            CatalogueEmptyState(
-                modifier =
-                    Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-            )
-        } else {
-            CatalogueGrid(
-                items = items,
-                onAdd = onAdd,
-                modifier =
-                    Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-            )
-        }
+    if (items.isEmpty()) {
+        CatalogueEmptyState(modifier = modifier.fillMaxSize())
+    } else {
+        CatalogueGrid(
+            items = items,
+            onAdd = onAdd,
+            modifier = modifier.fillMaxSize(),
+        )
     }
 }
 
