@@ -74,18 +74,12 @@ detail screen.
 including half-star values such as 4.5, survive an app restart and a catalogue
 refresh, and an unrated coffee is never treated as a zero-star rating.
 
-## Phase 5 — Favourites
+## Phase 5 — Favourites (skipped)
 
-**Goal:** Make preferred coffees easy to identify.
-
-**Rules:** `PRODUCT_SPEC.md` §4.
-
-- Toggle favourite status independently of rating.
-- Display favourite status clearly.
-- Provide a way to view favourites within the collection.
-
-**Complete when:** A user can mark/unmark favourites without changing ratings or
-collection membership.
+**Decision:** Skipped. The first release has no favourite status and no
+favourites screen; collection membership and ratings are the only personal
+state. The prototype in `docs/prototype/` still shows a favourites flow, so that
+screen is outdated.
 
 ## Phase 6 — Search and add from results
 
@@ -124,8 +118,7 @@ delivered separately:
 - Coffee detail view with extra catalogue information such as intensity, cup
   size, flavour notes, and decaf status. It reuses the Phase 4 rating control;
   do not add a second rating implementation.
-- Filters for favourites and unrated coffees, then optional product-attribute
-  filters.
+- Filters for unrated coffees, then optional product-attribute filters.
 - Personal tasting note, tasting date, and “would buy again” flag.
 
 **Complete when:** Each chosen addition has a clear user benefit and does not
@@ -140,8 +133,7 @@ device; do not add cloud sync or cross-device accounts without a separate
 decision.
 
 - Create and switch between profiles.
-- Keep each profile's collection membership, ratings, and favourites
-  independent.
+- Keep each profile's collection membership and ratings independent.
 - Compare profiles' ratings for the same catalogue coffee.
 
 **Complete when:** Switching profiles never leaks or overwrites another

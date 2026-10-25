@@ -1,7 +1,7 @@
 # Kawapka
 
 A personal coffee-capsule log: keep a collection of Nespresso Original capsules,
-rate them 0.5–5 stars, and mark favourites. Everything needed to build runs in a
+rate them 0.5–5 stars. Everything needed to build runs in a
 Docker container, so you never install Java or the Android SDK on your own
 machine. You write code in VS Code and run the app on your physical phone over
 WiFi.
