@@ -1,6 +1,6 @@
 ---
 name: phase-verification
-description: Use after completing any phase in docs/ROADMAP.md for the coffee pod ratings app to verify it. Covers persistence of collection membership, ratings, favourites, and date-added across app restarts; catalogue-refresh safety; empty, error, and missing-data states; plus ktlint/check, JVM unit tests, build, install, and on-phone manual checks.
+description: Use after completing any phase in docs/ROADMAP.md for the coffee pod ratings app to verify it. Covers persistence of collection membership, ratings, and date-added across app restarts; catalogue-refresh safety; empty, error, and missing-data states; plus ktlint/check, JVM unit tests, build, install, and on-phone manual checks.
 ---
 
 # Phase verification (coffee pod ratings)
@@ -12,7 +12,7 @@ installed.
 
 Read `docs/ROADMAP.md` for phase order and `docs/PRODUCT_SPEC.md` for the
 product rules this verification protects (catalogue vs. personal data, unrated
-is not zero-star, ratings and favourites are independent).
+is not zero-star).
 
 ## 1. Automated checks
 
@@ -38,11 +38,10 @@ Manually exercise these flows, restarting the app where noted:
 - Add coffees to the personal collection; add at least one without rating it.
 - Set, change, and clear ratings; confirm a cleared rating returns to the
   unrated state (never rendered as zero stars).
-- Toggle favourites independently of ratings and collection membership.
 - Confirm personal data is read from and written to Room (the single source of
   truth), not in-memory state.
-- Fully close and reopen the app. Collection membership, ratings, favourites,
-  and date-added values must all persist.
+- Fully close and reopen the app. Collection membership, ratings, and date-added
+  values must all persist.
 - Confirm date-added sorting stays consistent for entries added at different
   times.
 
@@ -52,8 +51,8 @@ Applies once the catalogue-download phase exists. Before then, verify that
 replacing the bundled fixture or changing the repository source leaves the Room
 data untouched.
 
-- Trigger a catalogue refresh. Personal collection membership, ratings,
-  favourites, and date-added values must be unaffected.
+- Trigger a catalogue refresh. Personal collection membership, ratings, and
+  date-added values must be unaffected.
 - Remove a product from the catalogue source (or simulate its disappearance) and
   refresh. A coffee that disappears from the latest catalogue must keep its
   existing personal history; do not infer discontinuation from a failed

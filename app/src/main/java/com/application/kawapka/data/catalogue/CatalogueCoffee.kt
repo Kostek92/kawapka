@@ -5,9 +5,9 @@ import androidx.annotation.DrawableRes
 /**
  * Shared product information for one coffee in the catalogue.
  *
- * This model must not contain personal data. Collection membership, ratings,
- * and favourites are stored separately and keyed by [id], so profiles can be
- * added later without changing the meaning of existing catalogue data.
+ * This model must not contain personal data. Collection membership and ratings
+ * are stored separately and keyed by [id], so profiles can be added later
+ * without changing the meaning of existing catalogue data.
  *
  * @property id Stable Nespresso SKU, or a stable slug when no SKU is available.
  * @property headline Short flavour headline shown on the catalogue tile.
