@@ -25,10 +25,13 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   `GeneratedCatalogueRepository`; `DummyCatalogue` stays as the preview/test
   fixture. Catalogue models carry no personal state. Personal state sits behind
   `CollectionRepository` (Room-backed in production) and keys off the stable
-  `CatalogueCoffee.id`; collection rows store only the catalogue id and date
-  added, never a copy of catalogue data. `KawapkaApplication` owns the database
-  and repository graph. `HomeRoute`/`HomeScreen` host the two top-level tabs
-  (`Catalogue`, `My Coffees`) and save the selected tab with Compose state.
+  `CatalogueCoffee.id`; collection rows store the catalogue id, date added, and
+  personal fields such as the optional 1–5 rating (never zero stars for
+  unrated), never a copy of catalogue data. `KawapkaApplication` owns the
+  database and repository graph. `HomeRoute`/`HomeScreen` host the two top-level
+  tabs (`Catalogue`, `My Coffees`) and save the selected tab with Compose state.
+  My Coffees shows a compact rating pill per card; tapping it opens a modal
+  rating sheet with large stars and a clear action.
   Screens use `lifecycle-viewmodel-compose` and `lifecycle-runtime-compose` for
   Route/ViewModel state collection.
 - `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the

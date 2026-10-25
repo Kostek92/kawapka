@@ -8,6 +8,16 @@
     <string name="nav_catalogue">Catalogue</string>
     <string name="nav_collection">My Coffees</string>
     <string name="collection_remove">Remove</string>
+    <string name="collection_rate">Rate</string>
+    <string name="collection_rating_value">%1$d/5</string>
+    <string name="collection_rating_button_unrated">Rate this coffee</string>
+    <string name="collection_rating_button_rated">Rated %1$d out of 5. Tap to change.</string>
+    <string name="collection_rating_sheet_title">Rate %1$s</string>
+    <string name="collection_rating_sheet_body">Tap a star to save your rating.</string>
+    <string name="collection_rating_star">Set rating to %1$d out of 5</string>
+    <string name="collection_rating_unrated">Not rated yet</string>
+    <string name="collection_rating_rated">Rated %1$d out of 5 stars</string>
+    <string name="collection_clear_rating">Clear rating</string>
     <string name="collection_empty_title">Your collection is empty</string>
     <string name="collection_empty_body">Add coffees from the catalogue to keep track of the ones you have.</string>
     <string name="collection_browse_catalogue">Browse catalogue</string>

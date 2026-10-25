@@ -16,4 +16,10 @@ interface CollectionDao {
 
     @Query("DELETE FROM collection_entries WHERE catalogueId = :catalogueId")
     suspend fun delete(catalogueId: String)
+
+    @Query("UPDATE collection_entries SET rating = :rating WHERE catalogueId = :catalogueId")
+    suspend fun updateRating(
+        catalogueId: String,
+        rating: Int?,
+    )
 }

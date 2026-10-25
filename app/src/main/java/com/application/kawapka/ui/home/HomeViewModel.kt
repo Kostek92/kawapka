@@ -7,6 +7,7 @@ import com.application.kawapka.data.catalogue.CatalogueRepository
 import com.application.kawapka.data.collection.CollectionEntry
 import com.application.kawapka.data.collection.CollectionRepository
 import com.application.kawapka.ui.catalogue.CatalogueItemUiState
+import com.application.kawapka.ui.collection.CollectionItemUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val catalogue: List<CatalogueItemUiState> = emptyList(),
-    val collection: List<CatalogueCoffee> = emptyList(),
+    val collection: List<CollectionItemUiState> = emptyList(),
 )
 
 class HomeViewModel(
@@ -39,6 +40,17 @@ class HomeViewModel(
 
     fun removeFromCollection(catalogueId: String) {
         viewModelScope.launch { collectionRepository.remove(catalogueId) }
+    }
+
+    fun setRating(
+        catalogueId: String,
+        rating: Int,
+    ) {
+        viewModelScope.launch { collectionRepository.setRating(catalogueId, rating) }
+    }
+
+    fun clearRating(catalogueId: String) {
+        viewModelScope.launch { collectionRepository.setRating(catalogueId, null) }
     }
 }
 
@@ -67,6 +79,14 @@ internal fun buildHomeUiState(
                     isInCollection = coffee.id in collectionIds,
                 )
             },
-        collection = orderedEntries.mapNotNull { entry -> coffeesById[entry.catalogueId] },
+        collection =
+            orderedEntries.mapNotNull { entry ->
+                coffeesById[entry.catalogueId]?.let { coffee ->
+                    CollectionItemUiState(
+                        coffee = coffee,
+                        rating = entry.rating,
+                    )
+                }
+            },
     )
 }

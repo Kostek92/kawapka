@@ -53,8 +53,8 @@ class HomeUiStateTest {
                 ),
             )
 
-        assertEquals(listOf("c", "a", "b"), state.collection.map { coffee -> coffee.id })
-        assertFalse(state.collection.any { coffee -> coffee.id == "missing" })
+        assertEquals(listOf("c", "a", "b"), state.collection.map { item -> item.coffee.id })
+        assertFalse(state.collection.any { item -> item.coffee.id == "missing" })
     }
 
     @Test
@@ -68,7 +68,7 @@ class HomeUiStateTest {
                 ),
             )
 
-        assertEquals(listOf("a"), state.collection.map { coffee -> coffee.id })
+        assertEquals(listOf("a"), state.collection.map { item -> item.coffee.id })
         assertEquals(3, state.catalogue.size)
     }
 
@@ -83,8 +83,25 @@ class HomeUiStateTest {
                 ),
             )
 
-        assertEquals(listOf("a"), state.collection.map { coffee -> coffee.id })
+        assertEquals(listOf("a"), state.collection.map { item -> item.coffee.id })
         assertTrue(state.catalogue.first { item -> item.coffee.id == "a" }.isInCollection)
+    }
+
+    @Test
+    fun `ratings follow their collection entries and unrated stays null`() {
+        val state =
+            buildHomeUiState(
+                coffees,
+                listOf(
+                    CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 4),
+                    CollectionEntry(catalogueId = "b", dateAdded = 20),
+                ),
+            )
+
+        assertEquals(
+            mapOf("a" to 4, "b" to null),
+            state.collection.associate { item -> item.coffee.id to item.rating },
+        )
     }
 
     @Test

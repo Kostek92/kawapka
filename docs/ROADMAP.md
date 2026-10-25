@@ -56,15 +56,24 @@ independently of the full catalogue.
 
 ## Phase 4 — Rate coffees
 
-**Goal:** Deliver the app's core value.
+**Goal:** Deliver the app's core value from My Coffees, without adding a coffee
+detail screen.
 
-**Rules:** `PRODUCT_SPEC.md` §4.
+**Rules:** `PRODUCT_SPEC.md` §4, §7.
 
-- Set, change, and clear a 1–5 star rating.
+- Add an optional 1–5 star rating to collection entries; unrated is `null`, not
+  zero stars.
+- Let the user set, change, and clear a rating from My Coffees with an
+  accessible star control. A compact control that opens a rating sheet is valid;
+  a full detail screen is not required.
 - Display rated and unrated coffees distinctly.
+- Persist ratings with a Room migration so existing collection entries survive
+  the update.
+- Keep catalogue cards unchanged: rating is personal collection state.
 
-**Complete when:** Ratings can be added, edited, and removed, and an unrated
-coffee is never treated as a zero-star rating.
+**Complete when:** Ratings can be added, edited, and cleared in My Coffees,
+survive an app restart and a catalogue refresh, and an unrated coffee is never
+treated as a zero-star rating.
 
 ## Phase 5 — Favourites
 
@@ -114,7 +123,8 @@ Do this only after the core release is reliable. Possible increments, each
 delivered separately:
 
 - Coffee detail view with extra catalogue information such as intensity, cup
-  size, flavour notes, and decaf status.
+  size, flavour notes, and decaf status. It reuses the Phase 4 rating control;
+  do not add a second rating implementation.
 - Filters for favourites and unrated coffees, then optional product-attribute
   filters.
 - Personal tasting note, tasting date, and “would buy again” flag.

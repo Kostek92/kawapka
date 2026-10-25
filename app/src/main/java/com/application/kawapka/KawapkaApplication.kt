@@ -20,7 +20,9 @@ class KawapkaApplication : Application() {
             applicationContext,
             KawapkaDatabase::class.java,
             "kawapka.db",
-        ).build()
+        )
+            .addMigrations(KawapkaDatabase.MIGRATION_1_2)
+            .build()
     }
 
     val catalogueRepository: CatalogueRepository by lazy { GeneratedCatalogueRepository() }

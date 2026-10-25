@@ -22,6 +22,7 @@ import com.application.kawapka.R
 import com.application.kawapka.data.catalogue.DummyCatalogue
 import com.application.kawapka.ui.catalogue.CatalogueItemUiState
 import com.application.kawapka.ui.catalogue.CatalogueScreen
+import com.application.kawapka.ui.collection.CollectionItemUiState
 import com.application.kawapka.ui.collection.CollectionScreen
 import com.application.kawapka.ui.theme.KawapkaTheme
 
@@ -41,6 +42,8 @@ fun HomeScreen(
     onTabSelected: (HomeTab) -> Unit,
     onAddToCollection: (String) -> Unit,
     onRemoveFromCollection: (String) -> Unit,
+    onSetRating: (String, Int) -> Unit,
+    onClearRating: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -73,9 +76,11 @@ fun HomeScreen(
         when (selectedTab) {
             HomeTab.Collection ->
                 CollectionScreen(
-                    coffees = uiState.collection,
+                    items = uiState.collection,
                     onRemove = onRemoveFromCollection,
                     onBrowseCatalogue = { onTabSelected(HomeTab.Catalogue) },
+                    onSetRating = onSetRating,
+                    onClearRating = onClearRating,
                     modifier = contentModifier,
                 )
 
@@ -99,6 +104,8 @@ private fun HomeScreenCataloguePreview() {
             onTabSelected = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
+            onSetRating = { _, _ -> },
+            onClearRating = {},
         )
     }
 }
@@ -113,14 +120,17 @@ private fun HomeScreenCollectionPreview() {
             onTabSelected = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
+            onSetRating = { _, _ -> },
+            onClearRating = {},
         )
     }
 }
 
 private fun previewState(): HomeUiState {
     val coffees = DummyCatalogue.coffees.take(4)
+    val ratings = listOf<Int?>(null, 3, 4, 5)
     return HomeUiState(
         catalogue = coffees.map { coffee -> CatalogueItemUiState(coffee = coffee, isInCollection = true) },
-        collection = coffees,
+        collection = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) },
     )
 }

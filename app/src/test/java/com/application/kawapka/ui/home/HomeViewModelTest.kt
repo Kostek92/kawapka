@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -56,7 +57,7 @@ class HomeViewModelTest {
 
             val state = viewModel.uiState.value
             assertTrue(state.catalogue.first { item -> item.coffee.id == "b" }.isInCollection)
-            assertEquals(listOf("b"), state.collection.map { coffee -> coffee.id })
+            assertEquals(listOf("b"), state.collection.map { item -> item.coffee.id })
         }
 
     @Test
@@ -84,6 +85,23 @@ class HomeViewModelTest {
             assertFalse(state.catalogue.first { item -> item.coffee.id == "a" }.isInCollection)
             assertTrue(state.collection.isEmpty())
             assertEquals(3, state.catalogue.size)
+        }
+
+    @Test
+    fun `rating can be set changed and cleared`() =
+        runTest {
+            val repository = FakeCollectionRepository()
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, repository)
+            viewModel.addToCollection("a")
+
+            viewModel.setRating("a", 4)
+            assertEquals(4, ratingOf(viewModel, "a"))
+
+            viewModel.setRating("a", 2)
+            assertEquals(2, ratingOf(viewModel, "a"))
+
+            viewModel.clearRating("a")
+            assertNull(ratingOf(viewModel, "a"))
         }
 
     @Test
@@ -116,4 +134,20 @@ private class FakeCollectionRepository(
     override suspend fun remove(catalogueId: String) {
         entries.update { current -> current.filterNot { entry -> entry.catalogueId == catalogueId } }
     }
+
+    override suspend fun setRating(
+        catalogueId: String,
+        rating: Int?,
+    ) {
+        entries.update { current ->
+            current.map { entry ->
+                if (entry.catalogueId == catalogueId) entry.copy(rating = rating) else entry
+            }
+        }
+    }
 }
+
+private fun ratingOf(
+    viewModel: HomeViewModel,
+    catalogueId: String,
+): Int? = viewModel.uiState.value.collection.first { item -> item.coffee.id == catalogueId }.rating

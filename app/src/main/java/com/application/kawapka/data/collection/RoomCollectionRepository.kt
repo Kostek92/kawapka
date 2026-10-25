@@ -19,6 +19,7 @@ class RoomCollectionRepository(
                 CollectionEntry(
                     catalogueId = entity.catalogueId,
                     dateAdded = entity.dateAdded,
+                    rating = entity.rating,
                 )
             }
         }
@@ -34,5 +35,20 @@ class RoomCollectionRepository(
 
     override suspend fun remove(catalogueId: String) {
         dao.delete(catalogueId)
+    }
+
+    override suspend fun setRating(
+        catalogueId: String,
+        rating: Int?,
+    ) {
+        require(rating == null || rating in MIN_RATING..MAX_RATING) {
+            "Rating must be null or between $MIN_RATING and $MAX_RATING"
+        }
+        dao.updateRating(catalogueId, rating)
+    }
+
+    companion object {
+        const val MIN_RATING = 1
+        const val MAX_RATING = 5
     }
 }
