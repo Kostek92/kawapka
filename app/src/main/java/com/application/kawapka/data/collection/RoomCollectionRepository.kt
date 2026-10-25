@@ -39,16 +39,19 @@ class RoomCollectionRepository(
 
     override suspend fun setRating(
         catalogueId: String,
-        rating: Int?,
+        rating: Float?,
     ) {
-        require(rating == null || rating in MIN_RATING..MAX_RATING) {
-            "Rating must be null or between $MIN_RATING and $MAX_RATING"
+        require(rating == null || isValidRating(rating)) {
+            "Rating must be null or a half-star value between $MIN_RATING and $MAX_RATING"
         }
         dao.updateRating(catalogueId, rating)
     }
 
     companion object {
-        const val MIN_RATING = 1
-        const val MAX_RATING = 5
+        const val MIN_RATING = 0.5f
+        const val MAX_RATING = 5f
+        const val RATING_STEP = 0.5f
+
+        fun isValidRating(rating: Float): Boolean = rating in MIN_RATING..MAX_RATING && rating % RATING_STEP == 0f
     }
 }

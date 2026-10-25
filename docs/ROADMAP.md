@@ -61,19 +61,18 @@ detail screen.
 
 **Rules:** `PRODUCT_SPEC.md` §4, §7.
 
-- Add an optional 1–5 star rating to collection entries; unrated is `null`, not
-  zero stars.
+- Add an optional 0.5–5 star rating in half-star increments to collection entries;
+  unrated is `null`, not zero stars.
 - Let the user set, change, and clear a rating from My Coffees with an
-  accessible star control. A compact control that opens a rating sheet is valid;
-  a full detail screen is not required.
-- Display rated and unrated coffees distinctly.
-- Persist ratings with a Room migration so existing collection entries survive
-  the update.
+  accessible star control that supports half-star selection. A compact control
+  that opens a rating sheet is valid; a full detail screen is not required.
+- Display rated and unrated coffees distinctly, including values such as 4.5.
+- Persist ratings in Room.
 - Keep catalogue cards unchanged: rating is personal collection state.
 
 **Complete when:** Ratings can be added, edited, and cleared in My Coffees,
-survive an app restart and a catalogue refresh, and an unrated coffee is never
-treated as a zero-star rating.
+including half-star values such as 4.5, survive an app restart and a catalogue
+refresh, and an unrated coffee is never treated as a zero-star rating.
 
 ## Phase 5 — Favourites
 

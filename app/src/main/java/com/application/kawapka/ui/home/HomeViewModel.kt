@@ -44,7 +44,7 @@ class HomeViewModel(
 
     fun setRating(
         catalogueId: String,
-        rating: Int,
+        rating: Float,
     ) {
         viewModelScope.launch { collectionRepository.setRating(catalogueId, rating) }
     }

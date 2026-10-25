@@ -13,5 +13,5 @@ import androidx.room.PrimaryKey
 data class CollectionEntryEntity(
     @PrimaryKey val catalogueId: String,
     val dateAdded: Long,
-    val rating: Int? = null,
+    val rating: Float? = null,
 )

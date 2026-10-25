@@ -32,23 +32,35 @@ class RoomCollectionRepositoryTest {
             val repository = RoomCollectionRepository(dao, currentTimeMillis = { 42L })
             repository.add("a")
 
-            repository.setRating("a", 4)
-            assertEquals(4, repository.entries.first().single().rating)
+            repository.setRating("a", 4.5f)
+            assertEquals(4.5f, repository.entries.first().single().rating)
 
-            repository.setRating("a", 2)
-            assertEquals(2, repository.entries.first().single().rating)
+            repository.setRating("a", 2.5f)
+            assertEquals(2.5f, repository.entries.first().single().rating)
 
             repository.setRating("a", null)
             assertNull(repository.entries.first().single().rating)
         }
 
     @Test
-    fun `ratings outside one to five are rejected`() =
+    fun `all half star ratings between half and five are accepted`() =
         runTest {
             val repository = RoomCollectionRepository(dao, currentTimeMillis = { 42L })
             repository.add("a")
 
-            listOf(0, 6, -1).forEach { rating ->
+            listOf(0.5f, 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f).forEach { rating ->
+                repository.setRating("a", rating)
+                assertEquals(rating, repository.entries.first().single().rating)
+            }
+        }
+
+    @Test
+    fun `ratings that are not half steps in half to five are rejected`() =
+        runTest {
+            val repository = RoomCollectionRepository(dao, currentTimeMillis = { 42L })
+            repository.add("a")
+
+            listOf(0f, 5.5f, 6f, -1f, 4.25f, Float.NaN).forEach { rating ->
                 val error = runCatching { repository.setRating("a", rating) }.exceptionOrNull()
                 assertTrue(error is IllegalArgumentException)
             }
@@ -73,7 +85,7 @@ private class FakeCollectionDao : CollectionDao {
 
     override suspend fun updateRating(
         catalogueId: String,
-        rating: Int?,
+        rating: Float?,
     ) {
         entries.update { current ->
             current.map { entry ->

@@ -18,20 +18,25 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
 - App stack: Room 2.6.1 (via KSP 2.0.20-1.0.25) for personal-data
   persistence in `kawapka.db`. Room schemas are exported to `app/schemas/` and
   committed; bump `KawapkaDatabase.version` with a migration rather than losing
-  user data. The app has no network client: catalogue data and images are
-  bundled in the APK. Add future dependencies only as their phase needs them
-  and record them here in the same change.
+  user data. Pre-release exception: the half-star change reuses version 2 with a
+  `REAL` rating column while data is disposable, so uninstall earlier v2 builds
+  before installing; Room rejects the old same-version `INTEGER` schema. Once
+  data matters, add migrations. The app has no network client: catalogue data
+  and images are bundled in the APK. Add future dependencies only as their phase
+  needs them and record them here in the same change.
 - Catalogue browsing sits behind `CatalogueRepository`. Production uses
   `GeneratedCatalogueRepository`; `DummyCatalogue` stays as the preview/test
   fixture. Catalogue models carry no personal state. Personal state sits behind
   `CollectionRepository` (Room-backed in production) and keys off the stable
   `CatalogueCoffee.id`; collection rows store the catalogue id, date added, and
-  personal fields such as the optional 1–5 rating (never zero stars for
-  unrated), never a copy of catalogue data. `KawapkaApplication` owns the
-  database and repository graph. `HomeRoute`/`HomeScreen` host the two top-level
-  tabs (`Catalogue`, `My Coffees`) and save the selected tab with Compose state.
-  My Coffees shows a compact rating pill per card; tapping it opens a modal
-  rating sheet with large stars and a clear action.
+  personal fields such as the optional 0.5–5 rating in half-star increments
+  (never zero stars for unrated), never a copy of catalogue data.
+  `KawapkaApplication` owns the database and repository graph.
+  `HomeRoute`/`HomeScreen` host the two top-level tabs (`Catalogue`,
+  `My Coffees`) and save the selected tab with Compose state. My Coffees shows a
+  compact rating pill per card; tapping it opens a modal rating sheet with 40dp
+  stars. Tapping a star's left or right half sets a half or whole value; whole
+  values display as `4/5`, half values as `4.5/5`.
   Screens use `lifecycle-viewmodel-compose` and `lifecycle-runtime-compose` for
   Route/ViewModel state collection.
 - `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the
@@ -56,9 +61,9 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   in the container (needs network, `curl`, Perl's core `JSON::PP`, and the JDK);
   it rewrites the generated Kotlin file and images. Inspect `git diff` afterwards;
   the script intentionally leaves the app code untouched.
-- `./gradlew test` — JVM unit tests for pure logic (rating set/change/clear,
-  sort comparators, snapshot/stable-id mapping, collection membership and
-  date-added ordering). Add tests as that logic lands.
+- `./gradlew test` — JVM unit tests for pure logic (half-star rating validation,
+  formatting, set/change/clear, sort comparators, snapshot/stable-id mapping,
+  collection membership and date-added ordering). Add tests as that logic lands.
 - Verification of user-visible work = successful build + install + launch on the
   physical phone (`adb shell am start -n <applicationId>/.MainActivity`).
 - Kotlin IntelliSense (JetBrains `kotlin-server`) needs a successful Gradle

@@ -93,13 +93,13 @@ class HomeUiStateTest {
             buildHomeUiState(
                 coffees,
                 listOf(
-                    CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 4),
+                    CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 4.5f),
                     CollectionEntry(catalogueId = "b", dateAdded = 20),
                 ),
             )
 
         assertEquals(
-            mapOf("a" to 4, "b" to null),
+            mapOf("a" to 4.5f, "b" to null),
             state.collection.associate { item -> item.coffee.id to item.rating },
         )
     }

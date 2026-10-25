@@ -42,7 +42,7 @@ fun HomeScreen(
     onTabSelected: (HomeTab) -> Unit,
     onAddToCollection: (String) -> Unit,
     onRemoveFromCollection: (String) -> Unit,
-    onSetRating: (String, Int) -> Unit,
+    onSetRating: (String, Float) -> Unit,
     onClearRating: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -128,7 +128,7 @@ private fun HomeScreenCollectionPreview() {
 
 private fun previewState(): HomeUiState {
     val coffees = DummyCatalogue.coffees.take(4)
-    val ratings = listOf<Int?>(null, 3, 4, 5)
+    val ratings = listOf<Float?>(null, 3f, 4.5f, 5f)
     return HomeUiState(
         catalogue = coffees.map { coffee -> CatalogueItemUiState(coffee = coffee, isInCollection = true) },
         collection = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) },

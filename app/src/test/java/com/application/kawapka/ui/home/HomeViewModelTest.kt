@@ -94,11 +94,11 @@ class HomeViewModelTest {
             val viewModel = HomeViewModel(CatalogueRepository { coffees }, repository)
             viewModel.addToCollection("a")
 
-            viewModel.setRating("a", 4)
-            assertEquals(4, ratingOf(viewModel, "a"))
+            viewModel.setRating("a", 4.5f)
+            assertEquals(4.5f, ratingOf(viewModel, "a"))
 
-            viewModel.setRating("a", 2)
-            assertEquals(2, ratingOf(viewModel, "a"))
+            viewModel.setRating("a", 2.5f)
+            assertEquals(2.5f, ratingOf(viewModel, "a"))
 
             viewModel.clearRating("a")
             assertNull(ratingOf(viewModel, "a"))
@@ -137,7 +137,7 @@ private class FakeCollectionRepository(
 
     override suspend fun setRating(
         catalogueId: String,
-        rating: Int?,
+        rating: Float?,
     ) {
         entries.update { current ->
             current.map { entry ->
@@ -150,4 +150,4 @@ private class FakeCollectionRepository(
 private fun ratingOf(
     viewModel: HomeViewModel,
     catalogueId: String,
-): Int? = viewModel.uiState.value.collection.first { item -> item.coffee.id == catalogueId }.rating
+): Float? = viewModel.uiState.value.collection.first { item -> item.coffee.id == catalogueId }.rating

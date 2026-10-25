@@ -51,7 +51,7 @@ fun CollectionScreen(
     items: List<CollectionItemUiState>,
     onRemove: (String) -> Unit,
     onBrowseCatalogue: () -> Unit,
-    onSetRating: (String, Int) -> Unit,
+    onSetRating: (String, Float) -> Unit,
     onClearRating: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -137,7 +137,7 @@ private fun CollectionActions(
 
 @Composable
 private fun RatingButton(
-    rating: Int?,
+    rating: Float?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -145,7 +145,7 @@ private fun RatingButton(
         if (rating == null) {
             stringResource(R.string.collection_rating_button_unrated)
         } else {
-            stringResource(R.string.collection_rating_button_rated, rating)
+            stringResource(R.string.collection_rating_button_rated, formatRating(rating))
         }
     OutlinedButton(
         onClick = onClick,
@@ -171,7 +171,7 @@ private fun RatingButton(
                 if (rating == null) {
                     stringResource(R.string.collection_rate)
                 } else {
-                    stringResource(R.string.collection_rating_value, rating)
+                    stringResource(R.string.collection_rating_value, formatRating(rating))
                 },
             style = MaterialTheme.typography.labelMedium,
             maxLines = 1,
@@ -237,7 +237,7 @@ private fun CollectionEmptyState(
 @Composable
 private fun CollectionScreenPreview() {
     val coffees = DummyCatalogue.coffees.take(4)
-    val ratings = listOf<Int?>(null, 3, 4, 5)
+    val ratings = listOf<Float?>(null, 3f, 4.5f, 5f)
     KawapkaTheme {
         CollectionScreen(
             items = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) },

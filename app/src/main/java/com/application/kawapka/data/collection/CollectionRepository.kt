@@ -23,6 +23,6 @@ interface CollectionRepository {
      */
     suspend fun setRating(
         catalogueId: String,
-        rating: Int?,
+        rating: Float?,
     )
 }

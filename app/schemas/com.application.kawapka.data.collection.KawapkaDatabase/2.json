@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "b57615da478453a6110afb1c65cee60e",
+    "identityHash": "ad5f22835fde806f99ba1428463d058b",
     "entities": [
       {
         "tableName": "collection_entries",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`catalogueId` TEXT NOT NULL, `dateAdded` INTEGER NOT NULL, `rating` INTEGER, PRIMARY KEY(`catalogueId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`catalogueId` TEXT NOT NULL, `dateAdded` INTEGER NOT NULL, `rating` REAL, PRIMARY KEY(`catalogueId`))",
         "fields": [
           {
             "fieldPath": "catalogueId",
@@ -23,7 +23,7 @@
           {
             "fieldPath": "rating",
             "columnName": "rating",
-            "affinity": "INTEGER",
+            "affinity": "REAL",
             "notNull": false
           }
         ],
@@ -40,7 +40,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b57615da478453a6110afb1c65cee60e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ad5f22835fde806f99ba1428463d058b')"
     ]
   }
 }

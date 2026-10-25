@@ -21,11 +21,11 @@ abstract class KawapkaDatabase : RoomDatabase() {
     abstract fun collectionDao(): CollectionDao
 
     companion object {
-        /** Adds the optional 1–5 rating; existing collection entries stay unrated. */
+        /** Adds the optional 0.5–5 half-star rating; existing collection entries stay unrated. */
         val MIGRATION_1_2 =
             object : Migration(1, 2) {
                 override fun migrate(database: SupportSQLiteDatabase) {
-                    database.execSQL("ALTER TABLE collection_entries ADD COLUMN rating INTEGER")
+                    database.execSQL("ALTER TABLE collection_entries ADD COLUMN rating REAL")
                 }
             }
     }

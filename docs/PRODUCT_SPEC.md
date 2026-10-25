@@ -13,7 +13,7 @@ The initial release is a simple single-user app. Multiple profiles are a later f
 - Browse the supported coffee catalogue.
 - View coffee images, names, and short descriptions.
 - Add coffees from the catalogue to a personal collection and remove them from that collection.
-- Rate a coffee from 1 to 5 stars, change a rating, or clear a rating.
+- Rate a coffee from 0.5 to 5 stars in half-star increments, change a rating, or clear a rating.
 - Mark and unmark coffees as favourites.
 - Search coffees by name.
 - Sort the personal collection by name, rating, and date added.
@@ -61,7 +61,7 @@ The catalogue and a person's collection are different concepts:
 For the initial single-user release, the personal collection contains:
 
 - Collection membership (added or not added).
-- An optional rating from 1 to 5 stars.
+- An optional rating from 0.5 to 5 stars in half-star increments.
 - Favourite status.
 - Date added, used for date sorting.
 

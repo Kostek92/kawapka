@@ -20,6 +20,6 @@ interface CollectionDao {
     @Query("UPDATE collection_entries SET rating = :rating WHERE catalogueId = :catalogueId")
     suspend fun updateRating(
         catalogueId: String,
-        rating: Int?,
+        rating: Float?,
     )
 }
