@@ -15,20 +15,28 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,18 +47,83 @@ import com.application.kawapka.ui.theme.KawapkaTheme
 @Composable
 fun CatalogueScreen(
     items: List<CatalogueItemUiState>,
+    query: String,
+    onQueryChange: (String) -> Unit,
     onAdd: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (items.isEmpty()) {
-        CatalogueEmptyState(modifier = modifier.fillMaxSize())
-    } else {
-        CatalogueGrid(
-            items = items,
-            onAdd = onAdd,
-            modifier = modifier.fillMaxSize(),
+    Column(modifier = modifier.fillMaxSize()) {
+        CatalogueSearchField(
+            query = query,
+            onQueryChange = onQueryChange,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 12.dp),
         )
+        when {
+            items.isNotEmpty() ->
+                CatalogueGrid(
+                    items = items,
+                    onAdd = onAdd,
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                )
+
+            query.isNotBlank() ->
+                CatalogueNoResultsState(
+                    query = query,
+                    onClearQuery = { onQueryChange("") },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                )
+
+            else ->
+                CatalogueEmptyState(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                )
+        }
     }
+}
+
+@Composable
+private fun CatalogueSearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val searchLabel = stringResource(R.string.catalogue_search_placeholder)
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = modifier.semantics { contentDescription = searchLabel },
+        singleLine = true,
+        shape = CircleShape,
+        placeholder = { Text(text = searchLabel) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+            )
+        },
+        trailingIcon = {
+            if (query.isNotBlank()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = stringResource(R.string.catalogue_search_clear),
+                    )
+                }
+            }
+        },
+    )
 }
 
 @Composable
@@ -62,7 +135,7 @@ private fun CatalogueGrid(
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -178,15 +251,51 @@ private fun CatalogueEmptyState(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+private fun CatalogueNoResultsState(
+    query: String,
+    onClearQuery: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.catalogue_search_no_results, query.trim()),
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        TextButton(onClick = onClearQuery) {
+            Text(text = stringResource(R.string.catalogue_search_clear))
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun CatalogueScreenPreview() {
     KawapkaTheme {
         CatalogueScreen(
-            items =
-                DummyCatalogue.coffees.mapIndexed { index, coffee ->
-                    CatalogueItemUiState(coffee = coffee, isInCollection = index % 3 == 0)
-                },
+            items = previewCatalogueItems(),
+            query = "",
+            onQueryChange = {},
+            onAdd = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CatalogueScreenFilteredPreview() {
+    val items = previewCatalogueItems()
+    KawapkaTheme {
+        CatalogueScreen(
+            items = filterCatalogue(items, "Master"),
+            query = "Master",
+            onQueryChange = {},
             onAdd = {},
         )
     }
@@ -196,6 +305,16 @@ private fun CatalogueScreenPreview() {
 @Composable
 private fun CatalogueScreenEmptyPreview() {
     KawapkaTheme {
-        CatalogueScreen(items = emptyList(), onAdd = {})
+        CatalogueScreen(
+            items = emptyList(),
+            query = "",
+            onQueryChange = {},
+            onAdd = {},
+        )
     }
 }
+
+private fun previewCatalogueItems(): List<CatalogueItemUiState> =
+    DummyCatalogue.coffees.mapIndexed { index, coffee ->
+        CatalogueItemUiState(coffee = coffee, isInCollection = index % 3 == 0)
+    }
