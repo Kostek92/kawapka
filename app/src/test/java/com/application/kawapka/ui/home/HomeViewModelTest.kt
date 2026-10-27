@@ -137,6 +137,21 @@ class HomeViewModelTest {
         }
 
     @Test
+    fun `adding a coffee from a filtered result keeps the query and updates membership`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+
+            viewModel.setCatalogueQuery("bra")
+            viewModel.addToCollection("b")
+
+            val state = viewModel.uiState.value
+            assertEquals("bra", state.catalogueQuery)
+            assertEquals(listOf("b"), state.catalogue.map { item -> item.coffee.id })
+            assertTrue(state.catalogue.single().isInCollection)
+            assertEquals(listOf("b"), state.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
     fun `setting a collection query filters the collection and clearing it restores every coffee`() =
         runTest {
             val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
