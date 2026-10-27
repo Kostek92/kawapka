@@ -4,6 +4,7 @@ import com.application.kawapka.data.catalogue.CatalogueCoffee
 import com.application.kawapka.data.catalogue.CatalogueRepository
 import com.application.kawapka.data.collection.CollectionEntry
 import com.application.kawapka.data.collection.CollectionRepository
+import com.application.kawapka.ui.collection.CollectionSort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -170,6 +171,57 @@ class HomeViewModelTest {
             val restored = viewModel.uiState.value
             assertEquals("", restored.collectionQuery)
             assertEquals(listOf("a", "b"), restored.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
+    fun `collection defaults to name order`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+
+            viewModel.addToCollection("c")
+            viewModel.addToCollection("a")
+
+            val state = viewModel.uiState.value
+            assertEquals(CollectionSort.Name, state.collectionSort)
+            assertEquals(listOf("a", "c"), state.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
+    fun `setting a collection sort reorders the collection`() =
+        runTest {
+            val repository =
+                FakeCollectionRepository(
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 2f),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20, rating = 5f),
+                        CollectionEntry(catalogueId = "c", dateAdded = 30),
+                    ),
+                )
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, repository)
+
+            viewModel.setCollectionSort(CollectionSort.RatingDescending)
+
+            val rated = viewModel.uiState.value
+            assertEquals(CollectionSort.RatingDescending, rated.collectionSort)
+            assertEquals(listOf("b", "a", "c"), rated.collection.map { item -> item.coffee.id })
+
+            viewModel.setCollectionSort(CollectionSort.Name)
+
+            assertEquals(listOf("a", "b", "c"), viewModel.uiState.value.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
+    fun `sort selection is retained when the collection changes`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+            viewModel.setCollectionSort(CollectionSort.RatingDescending)
+
+            viewModel.addToCollection("b")
+            viewModel.setRating("b", 4.5f)
+
+            val state = viewModel.uiState.value
+            assertEquals(CollectionSort.RatingDescending, state.collectionSort)
+            assertEquals(listOf("b"), state.collection.map { item -> item.coffee.id })
         }
 
     @Test

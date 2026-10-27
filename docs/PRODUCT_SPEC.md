@@ -15,7 +15,7 @@ The initial release is a simple single-user app. Multiple profiles are a later f
 - Add coffees from the catalogue to a personal collection and remove them from that collection.
 - Rate a coffee from 0.5 to 5 stars in half-star increments, change a rating, or clear a rating.
 - Search coffees by name.
-- Sort the personal collection by name, rating, and date added.
+- Sort the personal collection by name, intensity, and rating.
 - Retain personal data when the app is restarted or the catalogue is refreshed.
 - Handle empty results and missing product images without breaking the screen.
 
@@ -64,7 +64,6 @@ For the initial single-user release, the personal collection contains:
 
 - Collection membership (added or not added).
 - An optional rating from 0.5 to 5 stars in half-star increments.
-- Date added, used for date sorting.
 
 A coffee can be added before it has been tried or rated. An unrated coffee is not a zero-star coffee. Do not create duplicate collection entries for the same catalogue product. Removing a coffee from the collection must not delete the catalogue product.
 
@@ -75,9 +74,9 @@ Rating operations must allow setting, changing, and clearing a rating. Clearing 
 - Search the catalogue by coffee name.
 - Search results should indicate whether each coffee is already in the personal collection.
 - A coffee can be added directly from search results.
-- Sort the personal collection by name, rating, or date added.
-- Rating sort should support ascending and descending order; unrated coffees should appear after rated coffees in either direction.
-- Date-added sort should support newest-first and oldest-first.
+- Sort the personal collection by name, intensity, or rating.
+- Name sort is alphabetical; intensity and rating sort from highest to lowest.
+- Coffees without an intensity and unrated coffees should appear after coffees with a value.
 - Use a stable, predictable tie-breaker when sort values are equal.
 
 Do not add full-text search across flavour notes or advanced filtering to the first release.

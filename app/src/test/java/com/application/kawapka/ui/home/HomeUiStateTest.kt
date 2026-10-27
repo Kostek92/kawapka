@@ -2,6 +2,7 @@ package com.application.kawapka.ui.home
 
 import com.application.kawapka.data.catalogue.CatalogueCoffee
 import com.application.kawapka.data.collection.CollectionEntry
+import com.application.kawapka.ui.collection.CollectionSort
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -42,7 +43,7 @@ class HomeUiStateTest {
     }
 
     @Test
-    fun `collection follows repository entry order`() {
+    fun `collection defaults to name order`() {
         val state =
             buildHomeUiState(
                 coffees,
@@ -53,8 +54,27 @@ class HomeUiStateTest {
                 ),
             )
 
-        assertEquals(listOf("b", "c", "a"), state.collection.map { item -> item.coffee.id })
+        assertEquals(CollectionSort.Name, state.collectionSort)
+        assertEquals(listOf("a", "b", "c"), state.collection.map { item -> item.coffee.id })
         assertFalse(state.collection.any { item -> item.coffee.id == "missing" })
+    }
+
+    @Test
+    fun `selected sort orders the collection`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries =
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 4f),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20),
+                        CollectionEntry(catalogueId = "c", dateAdded = 30, rating = 5f),
+                    ),
+                collectionSort = CollectionSort.RatingDescending,
+            )
+
+        assertEquals(CollectionSort.RatingDescending, state.collectionSort)
+        assertEquals(listOf("c", "a", "b"), state.collection.map { item -> item.coffee.id })
     }
 
     @Test

@@ -9,7 +9,9 @@ import com.application.kawapka.data.collection.CollectionRepository
 import com.application.kawapka.ui.catalogue.CatalogueItemUiState
 import com.application.kawapka.ui.catalogue.filterCatalogue
 import com.application.kawapka.ui.collection.CollectionItemUiState
+import com.application.kawapka.ui.collection.CollectionSort
 import com.application.kawapka.ui.collection.filterCollection
+import com.application.kawapka.ui.collection.sortCollection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +24,7 @@ data class HomeUiState(
     val collection: List<CollectionItemUiState> = emptyList(),
     val catalogueQuery: String = "",
     val collectionQuery: String = "",
+    val collectionSort: CollectionSort = CollectionSort.Name,
 )
 
 class HomeViewModel(
@@ -31,14 +34,16 @@ class HomeViewModel(
     private val catalogue = catalogueRepository.coffees()
     private val catalogueQuery = MutableStateFlow("")
     private val collectionQuery = MutableStateFlow("")
+    private val collectionSort = MutableStateFlow(CollectionSort.Name)
 
     val uiState: StateFlow<HomeUiState> =
         combine(
             collectionRepository.entries,
             catalogueQuery,
             collectionQuery,
-        ) { entries, catalogueQuery, collectionQuery ->
-            buildHomeUiState(catalogue, entries, catalogueQuery, collectionQuery)
+            collectionSort,
+        ) { entries, catalogueQuery, collectionQuery, collectionSort ->
+            buildHomeUiState(catalogue, entries, catalogueQuery, collectionQuery, collectionSort)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -51,6 +56,10 @@ class HomeViewModel(
 
     fun setCollectionQuery(query: String) {
         collectionQuery.value = query
+    }
+
+    fun setCollectionSort(sort: CollectionSort) {
+        collectionSort.value = sort
     }
 
     fun addToCollection(catalogueId: String) {
@@ -78,7 +87,8 @@ class HomeViewModel(
  *
  * [catalogueQuery] filters the catalogue by coffee name in
  * [filterCatalogue] and [collectionQuery] does the same for the personal
- * collection in [filterCollection]. The two queries are independent. Entries
+ * collection in [filterCollection]. The two queries are independent.
+ * [collectionSort] orders the mapped collection in [sortCollection]. Entries
  * whose catalogue id is no longer in the snapshot stay in Room but are not
  * rendered; this keeps personal data safe across catalogue refreshes.
  */
@@ -87,6 +97,7 @@ internal fun buildHomeUiState(
     entries: List<CollectionEntry>,
     catalogueQuery: String = "",
     collectionQuery: String = "",
+    collectionSort: CollectionSort = CollectionSort.Name,
 ): HomeUiState {
     val collectionIds = entries.mapTo(mutableSetOf()) { it.catalogueId }
     val coffeesById = catalogue.associateBy { it.id }
@@ -111,8 +122,9 @@ internal fun buildHomeUiState(
 
     return HomeUiState(
         catalogue = filterCatalogue(catalogueItems, catalogueQuery),
-        collection = filterCollection(collectionItems, collectionQuery),
+        collection = filterCollection(sortCollection(collectionItems, collectionSort), collectionQuery),
         catalogueQuery = catalogueQuery,
         collectionQuery = collectionQuery,
+        collectionSort = collectionSort,
     )
 }
