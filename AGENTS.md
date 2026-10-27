@@ -39,10 +39,13 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   compact rating pill per card; tapping it opens a modal rating sheet with 40dp
   stars. Tapping a star's left or right half sets a half or whole value; whole
   values display as `4/5`, half values as `4.5/5`. Catalogue and collection
-  search queries plus the collection sort are in-memory `HomeViewModel` state,
-  not Room data, so they reset on app restart. Sort options are name (default),
-  intensity high→low, and rating high→low, with missing intensity and unrated
-  coffees last.
+  search queries plus separate catalogue and collection sorts are in-memory
+  `HomeViewModel` state, not Room data, so they reset on app restart. Both tabs
+  show an icon-only top-bar sort action; its menu marks the active option.
+  Catalogue sorts by name (default) or intensity high→low; My Coffees also
+  sorts by rating high→low. Missing intensity and unrated coffees sort last,
+  and changing a sort scrolls that grid back to the top. Both tabs share the
+  `SortAction` menu component but keep independent state.
   Screens use `lifecycle-viewmodel-compose` and `lifecycle-runtime-compose` for
   Route/ViewModel state collection.
 - `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the
