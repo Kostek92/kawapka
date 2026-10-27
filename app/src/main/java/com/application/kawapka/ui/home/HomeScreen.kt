@@ -22,6 +22,8 @@ import com.application.kawapka.R
 import com.application.kawapka.data.catalogue.DummyCatalogue
 import com.application.kawapka.ui.catalogue.CatalogueItemUiState
 import com.application.kawapka.ui.catalogue.CatalogueScreen
+import com.application.kawapka.ui.catalogue.CatalogueSort
+import com.application.kawapka.ui.catalogue.CatalogueSortAction
 import com.application.kawapka.ui.collection.CollectionItemUiState
 import com.application.kawapka.ui.collection.CollectionScreen
 import com.application.kawapka.ui.collection.CollectionSort
@@ -44,6 +46,7 @@ fun HomeScreen(
     onTabSelected: (HomeTab) -> Unit,
     onCatalogueQueryChange: (String) -> Unit,
     onCollectionQueryChange: (String) -> Unit,
+    onCatalogueSortChange: (CatalogueSort) -> Unit,
     onCollectionSortChange: (CollectionSort) -> Unit,
     onAddToCollection: (String) -> Unit,
     onRemoveFromCollection: (String) -> Unit,
@@ -57,11 +60,18 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text(text = stringResource(selectedTab.labelRes)) },
                 actions = {
-                    if (selectedTab == HomeTab.Collection && uiState.hasCollectionItems) {
-                        CollectionSortAction(
-                            sort = uiState.collectionSort,
-                            onSortChange = onCollectionSortChange,
-                        )
+                    when {
+                        selectedTab == HomeTab.Collection && uiState.hasCollectionItems ->
+                            CollectionSortAction(
+                                sort = uiState.collectionSort,
+                                onSortChange = onCollectionSortChange,
+                            )
+
+                        selectedTab == HomeTab.Catalogue && uiState.hasCatalogueItems ->
+                            CatalogueSortAction(
+                                sort = uiState.catalogueSort,
+                                onSortChange = onCatalogueSortChange,
+                            )
                     }
                 },
             )
@@ -98,6 +108,7 @@ fun HomeScreen(
                     onBrowseCatalogue = { onTabSelected(HomeTab.Catalogue) },
                     onSetRating = onSetRating,
                     onClearRating = onClearRating,
+                    sort = uiState.collectionSort,
                     modifier = contentModifier,
                 )
 
@@ -107,6 +118,7 @@ fun HomeScreen(
                     query = uiState.catalogueQuery,
                     onQueryChange = onCatalogueQueryChange,
                     onAdd = onAddToCollection,
+                    sort = uiState.catalogueSort,
                     modifier = contentModifier,
                 )
         }
@@ -123,6 +135,7 @@ private fun HomeScreenCataloguePreview() {
             onTabSelected = {},
             onCatalogueQueryChange = {},
             onCollectionQueryChange = {},
+            onCatalogueSortChange = {},
             onCollectionSortChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
@@ -142,6 +155,7 @@ private fun HomeScreenCollectionPreview() {
             onTabSelected = {},
             onCatalogueQueryChange = {},
             onCollectionQueryChange = {},
+            onCatalogueSortChange = {},
             onCollectionSortChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
@@ -157,6 +171,7 @@ private fun previewState(): HomeUiState {
     return HomeUiState(
         catalogue = coffees.map { coffee -> CatalogueItemUiState(coffee = coffee, isInCollection = true) },
         collection = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) },
+        hasCatalogueItems = true,
         hasCollectionItems = true,
     )
 }
