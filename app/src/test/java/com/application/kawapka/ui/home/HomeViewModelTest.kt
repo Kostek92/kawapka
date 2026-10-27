@@ -47,6 +47,7 @@ class HomeViewModelTest {
 
             assertTrue(viewModel.uiState.value.catalogue.none { item -> item.isInCollection })
             assertTrue(viewModel.uiState.value.collection.isEmpty())
+            assertFalse(viewModel.uiState.value.hasCollectionItems)
         }
 
     @Test
@@ -59,6 +60,7 @@ class HomeViewModelTest {
             val state = viewModel.uiState.value
             assertTrue(state.catalogue.first { item -> item.coffee.id == "b" }.isInCollection)
             assertEquals(listOf("b"), state.collection.map { item -> item.coffee.id })
+            assertTrue(state.hasCollectionItems)
         }
 
     @Test
@@ -85,6 +87,7 @@ class HomeViewModelTest {
             val state = viewModel.uiState.value
             assertFalse(state.catalogue.first { item -> item.coffee.id == "a" }.isInCollection)
             assertTrue(state.collection.isEmpty())
+            assertFalse(state.hasCollectionItems)
             assertEquals(3, state.catalogue.size)
         }
 

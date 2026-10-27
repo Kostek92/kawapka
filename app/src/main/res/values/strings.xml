@@ -24,4 +24,8 @@
     <string name="collection_empty_title">Your collection is empty</string>
     <string name="collection_empty_body">Add coffees from the catalogue to keep track of the ones you have.</string>
     <string name="collection_browse_catalogue">Browse catalogue</string>
+    <string name="collection_sort_action">Sort collection, currently %1$s</string>
+    <string name="collection_sort_name">Name (A–Z)</string>
+    <string name="collection_sort_intensity">Intensity (high to low)</string>
+    <string name="collection_sort_rating">Rating (high to low)</string>
 </resources>
