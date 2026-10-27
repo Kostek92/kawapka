@@ -95,15 +95,17 @@ plan lives in [`PHASE_5_PLAN.md`](PHASE_5_PLAN.md).
 - **5.4 Sort model and comparators** — name, intensity (highest first), and
   rating (highest first); missing intensity and unrated last; stable
   tie-breaker.
-- **5.5 Sort control** — visible active sort on My Coffees with a menu to
-  change it.
+- **5.5 Sort actions** — top-bar sort actions on Browse and My Coffees.
+  Browse sorts by name or intensity; My Coffees by name, intensity, or rating;
+  each tab keeps its own choice.
 - **5.6 Hardening and verification** — tests, previews, docs, and the
   `phase-verification` checklist.
 
 **Complete when:** A user can find a known coffee by name and add it without
-manually browsing the entire catalogue, and can sort My Coffees by name,
-intensity, or rating with missing intensity and unrated coffees last and a
-visible active sort.
+manually browsing the entire catalogue, and can sort the catalogue by name or
+intensity and My Coffees by name, intensity, or rating, with missing intensity
+and unrated coffees last, independent sort choices, and a visible sort action
+whose menu marks the active sort.
 
 ## Phase 6 — Optional coffee details
 
