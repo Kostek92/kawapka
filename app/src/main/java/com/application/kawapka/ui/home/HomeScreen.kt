@@ -41,6 +41,7 @@ fun HomeScreen(
     uiState: HomeUiState,
     onTabSelected: (HomeTab) -> Unit,
     onCatalogueQueryChange: (String) -> Unit,
+    onCollectionQueryChange: (String) -> Unit,
     onAddToCollection: (String) -> Unit,
     onRemoveFromCollection: (String) -> Unit,
     onSetRating: (String, Float) -> Unit,
@@ -78,6 +79,8 @@ fun HomeScreen(
             HomeTab.Collection ->
                 CollectionScreen(
                     items = uiState.collection,
+                    query = uiState.collectionQuery,
+                    onQueryChange = onCollectionQueryChange,
                     onRemove = onRemoveFromCollection,
                     onBrowseCatalogue = { onTabSelected(HomeTab.Catalogue) },
                     onSetRating = onSetRating,
@@ -106,6 +109,7 @@ private fun HomeScreenCataloguePreview() {
             uiState = previewState(),
             onTabSelected = {},
             onCatalogueQueryChange = {},
+            onCollectionQueryChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
             onSetRating = { _, _ -> },
@@ -123,6 +127,7 @@ private fun HomeScreenCollectionPreview() {
             uiState = previewState(),
             onTabSelected = {},
             onCatalogueQueryChange = {},
+            onCollectionQueryChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
             onSetRating = { _, _ -> },

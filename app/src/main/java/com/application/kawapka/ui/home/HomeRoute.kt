@@ -34,6 +34,7 @@ fun HomeRoute(
         uiState = uiState,
         onTabSelected = { tab -> selectedTab = tab },
         onCatalogueQueryChange = viewModel::setCatalogueQuery,
+        onCollectionQueryChange = viewModel::setCollectionQuery,
         onAddToCollection = viewModel::addToCollection,
         onRemoveFromCollection = viewModel::removeFromCollection,
         onSetRating = viewModel::setRating,
