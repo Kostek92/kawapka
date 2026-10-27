@@ -24,6 +24,8 @@ import com.application.kawapka.ui.catalogue.CatalogueItemUiState
 import com.application.kawapka.ui.catalogue.CatalogueScreen
 import com.application.kawapka.ui.collection.CollectionItemUiState
 import com.application.kawapka.ui.collection.CollectionScreen
+import com.application.kawapka.ui.collection.CollectionSort
+import com.application.kawapka.ui.collection.CollectionSortAction
 import com.application.kawapka.ui.theme.KawapkaTheme
 
 enum class HomeTab(
@@ -42,6 +44,7 @@ fun HomeScreen(
     onTabSelected: (HomeTab) -> Unit,
     onCatalogueQueryChange: (String) -> Unit,
     onCollectionQueryChange: (String) -> Unit,
+    onCollectionSortChange: (CollectionSort) -> Unit,
     onAddToCollection: (String) -> Unit,
     onRemoveFromCollection: (String) -> Unit,
     onSetRating: (String, Float) -> Unit,
@@ -51,7 +54,17 @@ fun HomeScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(text = stringResource(selectedTab.labelRes)) })
+            TopAppBar(
+                title = { Text(text = stringResource(selectedTab.labelRes)) },
+                actions = {
+                    if (selectedTab == HomeTab.Collection && uiState.hasCollectionItems) {
+                        CollectionSortAction(
+                            sort = uiState.collectionSort,
+                            onSortChange = onCollectionSortChange,
+                        )
+                    }
+                },
+            )
         },
         bottomBar = {
             NavigationBar {
@@ -110,6 +123,7 @@ private fun HomeScreenCataloguePreview() {
             onTabSelected = {},
             onCatalogueQueryChange = {},
             onCollectionQueryChange = {},
+            onCollectionSortChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
             onSetRating = { _, _ -> },
@@ -128,6 +142,7 @@ private fun HomeScreenCollectionPreview() {
             onTabSelected = {},
             onCatalogueQueryChange = {},
             onCollectionQueryChange = {},
+            onCollectionSortChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
             onSetRating = { _, _ -> },
@@ -142,5 +157,6 @@ private fun previewState(): HomeUiState {
     return HomeUiState(
         catalogue = coffees.map { coffee -> CatalogueItemUiState(coffee = coffee, isInCollection = true) },
         collection = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) },
+        hasCollectionItems = true,
     )
 }

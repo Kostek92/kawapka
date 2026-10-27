@@ -35,6 +35,7 @@ fun HomeRoute(
         onTabSelected = { tab -> selectedTab = tab },
         onCatalogueQueryChange = viewModel::setCatalogueQuery,
         onCollectionQueryChange = viewModel::setCollectionQuery,
+        onCollectionSortChange = viewModel::setCollectionSort,
         onAddToCollection = viewModel::addToCollection,
         onRemoveFromCollection = viewModel::removeFromCollection,
         onSetRating = viewModel::setRating,

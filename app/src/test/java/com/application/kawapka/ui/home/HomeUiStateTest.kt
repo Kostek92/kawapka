@@ -23,6 +23,7 @@ class HomeUiStateTest {
         assertEquals(coffees, state.catalogue.map { item -> item.coffee })
         assertTrue(state.catalogue.none { item -> item.isInCollection })
         assertTrue(state.collection.isEmpty())
+        assertFalse(state.hasCollectionItems)
     }
 
     @Test
@@ -90,6 +91,19 @@ class HomeUiStateTest {
 
         assertEquals(listOf("a"), state.collection.map { item -> item.coffee.id })
         assertEquals(3, state.catalogue.size)
+        assertTrue(state.hasCollectionItems)
+    }
+
+    @Test
+    fun `collection with only missing catalogue coffees has no visible items`() {
+        val state =
+            buildHomeUiState(
+                coffees,
+                listOf(CollectionEntry(catalogueId = "missing", dateAdded = 10)),
+            )
+
+        assertTrue(state.collection.isEmpty())
+        assertFalse(state.hasCollectionItems)
     }
 
     @Test
@@ -183,6 +197,7 @@ class HomeUiStateTest {
 
         assertTrue(state.collection.isEmpty())
         assertEquals(3, state.catalogue.size)
+        assertTrue(state.hasCollectionItems)
     }
 
     @Test
@@ -213,5 +228,6 @@ class HomeUiStateTest {
 
         assertTrue(state.catalogue.isEmpty())
         assertTrue(state.collection.isEmpty())
+        assertFalse(state.hasCollectionItems)
     }
 }

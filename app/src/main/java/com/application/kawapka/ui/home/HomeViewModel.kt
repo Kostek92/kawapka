@@ -25,6 +25,7 @@ data class HomeUiState(
     val catalogueQuery: String = "",
     val collectionQuery: String = "",
     val collectionSort: CollectionSort = CollectionSort.Name,
+    val hasCollectionItems: Boolean = false,
 )
 
 class HomeViewModel(
@@ -91,6 +92,8 @@ class HomeViewModel(
  * [collectionSort] orders the mapped collection in [sortCollection]. Entries
  * whose catalogue id is no longer in the snapshot stay in Room but are not
  * rendered; this keeps personal data safe across catalogue refreshes.
+ * [HomeUiState.hasCollectionItems] ignores the collection query so the sort
+ * action stays available while a search has no matches.
  */
 internal fun buildHomeUiState(
     catalogue: List<CatalogueCoffee>,
@@ -126,5 +129,6 @@ internal fun buildHomeUiState(
         catalogueQuery = catalogueQuery,
         collectionQuery = collectionQuery,
         collectionSort = collectionSort,
+        hasCollectionItems = collectionItems.isNotEmpty(),
     )
 }
