@@ -1,6 +1,7 @@
 # Phase 5 implementation plan — Search and sorting
 
-**Status:** In progress. 5.1–5.4 are implemented; 5.5–5.6 remain.
+**Status:** In progress. 5.1–5.4 are implemented; 5.5 is in progress; 5.6
+remains.
 
 **Roadmap:** This phase replaces the former separate search (old Phase 6) and
 sorting (old Phase 7) phases. Favourites remains skipped for the first release;
@@ -14,6 +15,7 @@ collection manageable:
 - Find a catalogue coffee by name.
 - See whether a search result is already in My Coffees.
 - Add a coffee directly from search results.
+- Sort the catalogue by name or intensity.
 - Sort My Coffees by name, intensity, or rating.
 
 The phase is deliberately split into small increments. Each increment should be
@@ -32,13 +34,19 @@ phone.
   existing membership indicator and Add/Added action stay in place; no separate
   search screen or second card implementation.
 - A visible no-results state with a way to clear the query.
+- Sorting the catalogue (Browse) by:
+  - name, A–Z;
+  - intensity, high to low.
 - Sorting My Coffees by:
   - name, A–Z;
   - intensity, high to low;
   - rating, high to low.
 - Coffees without an intensity appear after those with a value.
 - Unrated coffees appear after rated coffees.
-- A visible active sort option and a stable tie-breaker.
+- A sort action on each tab whose menu marks and changes that tab's active
+  sort.
+- Independent sort choices for Browse and My Coffees.
+- A stable tie-breaker for equal sort values.
 
 ### Out of scope
 
@@ -49,8 +57,8 @@ phone.
 - Persisting the search query or sort choice in Room.
 - Sorting by date added. Date added is legacy storage only and is not displayed
   or used for ordering.
-- Sorting the catalogue or search results. Sorting applies only to My Coffees,
-  as specified in `PRODUCT_SPEC.md` §5.
+- Sorting Browse by rating. Ratings are personal collection state and do not
+  affect the catalogue tab.
 - Diacritic folding (for example matching `zbozowy` to `zbożowy`). Search is
   case-insensitive but otherwise matches the coffee name as written.
 - New libraries, database schema changes, or a Room migration.
@@ -60,7 +68,19 @@ phone.
 - Search and sort state live in `HomeViewModel`, not in composables. They
   survive tab switches and configuration changes; they reset on app restart.
   Persisting them is not required.
-- The default collection sort is name, A–Z.
+- `catalogueSort` and `collectionSort` are independent. Changing the sort on one
+  tab does not change the other.
+- The sort action lives in the shared top app bar and appears on both Browse and
+  My Coffees. It is icon-only; the open menu marks the active option with a
+  check icon, and the action's accessibility description names the current
+  sort.
+- The sort action is hidden when the active tab has no items but stays visible
+  when a search on that tab returns no matches.
+- The active sort is not shown as text in the top bar. This is a deliberate
+  change from the earlier header-row design; “visible active sort” means the
+  checked option in the open menu.
+- The default catalogue sort is name, A–Z. The default collection sort is also
+  name, A–Z.
 - Every sort ends with a stable tie-breaker. Name sorts use the coffee id;
   intensity and rating sorts use the coffee name (case-insensitive) and then the
   coffee id. This makes equal values predictable without relying on input order.
@@ -68,8 +88,8 @@ phone.
 - `dateAdded` stays in Room for backwards compatibility only. It is no longer
   carried into `CollectionItemUiState` or used for ordering, and should be
   removed in a future database migration.
-- The search bar is only on the Catalogue tab. The sort control is only on My
-  Coffees and is hidden when the collection is empty.
+- The search bar appears on both Catalogue and My Coffees. Sorting applies to
+  the visible results, including filtered search results, on both tabs.
 
 ## Increments
 
@@ -202,35 +222,47 @@ items correctly, with no visible sort control yet.
 **Done when:** Unit tests cover every sort option and the app builds with the
 collection in name order and no sort control yet.
 
-### 5.5 — Sort control on My Coffees
+### 5.5 — Sort actions on Browse and My Coffees
 
-**Deliverable:** The user can see and change the active sort from My Coffees.
+**Deliverable:** The user can see and change the active sort independently on
+Browse and My Coffees.
 
 **Changes:**
 
-- Add `sort` and `onSortChange` to `CollectionScreen`; pass them through
-  `HomeScreen` and `HomeRoute` to `HomeViewModel.setCollectionSort`.
-- Add a compact header row above the collection grid showing the active sort
-  label and opening a menu with the three options. Mark the active option with a
-  check icon.
-- Hide the sort control when the collection is empty; the existing empty state
-  remains the primary content.
-- Add strings for every sort option and for the control’s accessibility
-  description.
-- Add previews with a selected sort, an unrated coffee, and a coffee without an
-  intensity.
+- Add a `CatalogueSort` enum with `Name` and `IntensityDescending`, and a pure
+  `sortCatalogue` helper in `ui/catalogue/`. Apply it to filtered catalogue
+  results so search and sort compose.
+- Add `catalogueSort` to `HomeUiState` and `setCatalogueSort` to `HomeViewModel`
+  alongside the existing collection sort.
+- Add `hasCatalogueItems` to `HomeUiState`, computed from the unfiltered
+  catalogue, so the Browse sort action stays visible when a search has no
+  matches and hides for an empty catalogue.
+- Extract the icon-only menu from `CollectionSortAction` into a shared
+  `SortAction` used by both tabs. Each tab supplies its own options and strings.
+- Show the Browse action with name and intensity options. Keep the My Coffees
+  action with name, intensity, and rating.
+- Add strings for Browse sort options and its accessibility description, and
+  update the My Coffees strings as needed.
+- Add previews for both actions, with a selected sort, an unrated coffee, and a
+  coffee without an intensity.
 - Keep the rating sheet working when the order changes; it already looks up its
   coffee by id.
 
 **Tests:**
 
-- ViewModel test: changing the sort updates `collectionSort` and the order.
-- Sort selection is retained when the collection is updated (add, remove,
-  rate, clear rating).
-- Previews render the active sort label.
+- `sortCatalogue`: name order is case-insensitive; intensity is highest first;
+  missing intensity is last; equal values use name then id.
+- Search plus sort produces filtered results in the selected order.
+- ViewModel tests: changing either sort updates only that tab's state and order;
+  each default is name.
+- `hasCatalogueItems` and `hasCollectionItems` stay true when the matching query
+  has no results and are false for empty data.
+- Sort selections are retained when collection membership or ratings change.
+- Previews render both sort actions.
 
-**Done when:** Every sort option is selectable, the active option is visible,
-and the collection reorders immediately.
+**Done when:** Browse reorders by name or intensity, My Coffees reorders by
+name, intensity, or rating, each tab marks its active option, and changing one
+tab's sort leaves the other unchanged.
 
 ### 5.6 — Hardening, documentation, and verification
 
@@ -244,8 +276,9 @@ verified on the phone.
   - query and sort retained while adding, removing, rating, and clearing a
     rating;
   - catalogue entries missing from the snapshot with every sort option;
-  - coffees without an intensity sorted last;
-  - unrated coffees never treated as zero stars.
+  - coffees without an intensity sorted last on both tabs;
+  - unrated coffees never treated as zero stars;
+  - independent catalogue and collection sort state.
 - Check tab switching manually; the tab selection lives in `HomeRoute`, while
   the query and sort live in the ViewModel.
 - Update `AGENTS.md` with the search/sort state location, the sort options, and
@@ -262,18 +295,26 @@ verified on the phone.
 - Clear the query from both the field and the no-results state.
 - Add an unadded result; it changes to Added and appears in My Coffees.
 - Confirm an already-added result cannot be added twice.
-- Switch tabs and back; the query and results are retained.
-- Rotate the phone; the query and sort are retained.
+- Switch tabs and back; the query and each sort choice are retained
+  independently.
+- Rotate the phone; the queries and sort choices are retained.
 - Add several coffees, rate some (including a half-star value), and leave at
   least one unrated.
-- Check every sort option. Unrated coffees and coffees without an intensity
-  stay after coffees with a value.
+- Confirm the sort action appears on both Browse and My Coffees and is hidden
+  when the active tab has no items.
+- Open each sort menu; the active option is checked.
+- On Browse, check name and intensity sorts. Coffees without an intensity stay
+  after coffees with a value.
+- On My Coffees, check every sort option. Unrated coffees and coffees without an
+  intensity stay after coffees with a value.
+- Confirm the sort action stays available when a search on either tab has no
+  matches.
 - Confirm equal ratings and equal intensities keep a stable order.
 - Change and clear a rating while sorted by rating; the coffee moves to the
   correct group.
 - Confirm date added is not displayed or used for ordering.
-- Restart the app. Collection membership and ratings persist; the query clears
-  and the sort returns to name order, as expected.
+- Restart the app. Collection membership and ratings persist; the queries clear
+  and both sorts return to name order, as expected.
 - Refresh the catalogue and confirm personal data and sorting remain safe.
 - Check empty catalogue, empty collection, no search results, missing image,
   and missing optional fields.
@@ -290,7 +331,9 @@ persistence, catalogue-refresh, or edge-state failure.
 3. `Complete search result states`
 4. `Drop date added from collection sorting`
 5. `Add collection sort comparators`
-6. `Add collection sort control`
-7. `Verify search and sorting`
+6. `Add collection sort action`
+7. `Add catalogue sort comparators`
+8. `Add catalogue sort action`
+9. `Verify search and sorting`
 
 Each commit should leave the app buildable and the tests green.

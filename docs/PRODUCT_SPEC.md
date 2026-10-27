@@ -74,9 +74,11 @@ Rating operations must allow setting, changing, and clearing a rating. Clearing 
 - Search the catalogue by coffee name.
 - Search results should indicate whether each coffee is already in the personal collection.
 - A coffee can be added directly from search results.
+- Sort the catalogue by name or intensity.
 - Sort the personal collection by name, intensity, or rating.
 - Name sort is alphabetical; intensity and rating sort from highest to lowest.
 - Coffees without an intensity and unrated coffees should appear after coffees with a value.
+- The catalogue and personal collection keep independent sort choices.
 - Use a stable, predictable tie-breaker when sort values are equal.
 
 Do not add full-text search across flavour notes or advanced filtering to the first release.
