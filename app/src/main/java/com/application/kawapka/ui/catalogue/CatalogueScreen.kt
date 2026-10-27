@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -25,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -44,6 +46,7 @@ fun CatalogueScreen(
     query: String,
     onQueryChange: (String) -> Unit,
     onAdd: (String) -> Unit,
+    sort: CatalogueSort,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -60,6 +63,7 @@ fun CatalogueScreen(
                 CatalogueGrid(
                     items = items,
                     onAdd = onAdd,
+                    sort = sort,
                     modifier =
                         Modifier
                             .weight(1f)
@@ -91,10 +95,14 @@ fun CatalogueScreen(
 private fun CatalogueGrid(
     items: List<CatalogueItemUiState>,
     onAdd: (String) -> Unit,
+    sort: CatalogueSort,
     modifier: Modifier = Modifier,
 ) {
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(sort) { gridState.scrollToItem(0) }
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
+        state = gridState,
         modifier = modifier,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -221,6 +229,7 @@ private fun CatalogueScreenPreview() {
             query = "",
             onQueryChange = {},
             onAdd = {},
+            sort = CatalogueSort.Name,
         )
     }
 }
@@ -235,6 +244,7 @@ private fun CatalogueScreenFilteredPreview() {
             query = "Master",
             onQueryChange = {},
             onAdd = {},
+            sort = CatalogueSort.Name,
         )
     }
 }
@@ -249,6 +259,7 @@ private fun CatalogueScreenNoResultsPreview() {
             query = query,
             onQueryChange = {},
             onAdd = {},
+            sort = CatalogueSort.Name,
         )
     }
 }
@@ -262,6 +273,7 @@ private fun CatalogueScreenEmptyPreview() {
             query = "",
             onQueryChange = {},
             onAdd = {},
+            sort = CatalogueSort.Name,
         )
     }
 }

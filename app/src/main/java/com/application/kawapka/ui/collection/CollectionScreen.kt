@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -30,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -61,6 +63,7 @@ fun CollectionScreen(
     onBrowseCatalogue: () -> Unit,
     onSetRating: (String, Float) -> Unit,
     onClearRating: (String) -> Unit,
+    sort: CollectionSort,
     modifier: Modifier = Modifier,
 ) {
     var ratingCoffeeId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -81,6 +84,7 @@ fun CollectionScreen(
                     items = items,
                     onRemove = onRemove,
                     onRateClick = { coffeeId -> ratingCoffeeId = coffeeId },
+                    sort = sort,
                     modifier =
                         Modifier
                             .weight(1f)
@@ -123,10 +127,14 @@ private fun CollectionGrid(
     items: List<CollectionItemUiState>,
     onRemove: (String) -> Unit,
     onRateClick: (String) -> Unit,
+    sort: CollectionSort,
     modifier: Modifier = Modifier,
 ) {
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(sort) { gridState.scrollToItem(0) }
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
+        state = gridState,
         modifier = modifier,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -285,6 +293,7 @@ private fun CollectionScreenPreview() {
             onBrowseCatalogue = {},
             onSetRating = { _, _ -> },
             onClearRating = {},
+            sort = CollectionSort.Name,
         )
     }
 }
@@ -302,6 +311,7 @@ private fun CollectionScreenFilteredPreview() {
             onBrowseCatalogue = {},
             onSetRating = { _, _ -> },
             onClearRating = {},
+            sort = CollectionSort.Name,
         )
     }
 }
@@ -318,6 +328,7 @@ private fun CollectionScreenEmptyPreview() {
             onBrowseCatalogue = {},
             onSetRating = { _, _ -> },
             onClearRating = {},
+            sort = CollectionSort.Name,
         )
     }
 }
