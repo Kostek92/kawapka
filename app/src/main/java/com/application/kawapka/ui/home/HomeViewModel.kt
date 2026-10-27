@@ -90,10 +90,7 @@ internal fun buildHomeUiState(
 ): HomeUiState {
     val collectionIds = entries.mapTo(mutableSetOf()) { it.catalogueId }
     val coffeesById = catalogue.associateBy { it.id }
-    val orderedEntries =
-        entries
-            .sortedWith(compareByDescending<CollectionEntry> { it.dateAdded }.thenBy { it.catalogueId })
-            .distinctBy { it.catalogueId }
+    val uniqueEntries = entries.distinctBy { it.catalogueId }
     val catalogueItems =
         catalogue.map { coffee ->
             CatalogueItemUiState(
@@ -103,7 +100,7 @@ internal fun buildHomeUiState(
         }
 
     val collectionItems =
-        orderedEntries.mapNotNull { entry ->
+        uniqueEntries.mapNotNull { entry ->
             coffeesById[entry.catalogueId]?.let { coffee ->
                 CollectionItemUiState(
                     coffee = coffee,

@@ -5,7 +5,8 @@ package com.application.kawapka.data.collection
  *
  * Personal state is keyed by the stable catalogue id so the bundled catalogue
  * can be replaced independently. [dateAdded] is stored as epoch milliseconds
- * and is used to keep the collection in a stable order. [rating] is a half-star
+ * only for backwards compatibility; it no longer affects ordering and is
+ * scheduled for removal in a future database migration. [rating] is a half-star
  * value from 0.5 to 5, or `null` when the coffee has not been rated yet.
  */
 data class CollectionEntry(

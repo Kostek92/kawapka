@@ -169,7 +169,7 @@ class HomeViewModelTest {
 
             val restored = viewModel.uiState.value
             assertEquals("", restored.collectionQuery)
-            assertEquals(listOf("b", "a"), restored.collection.map { item -> item.coffee.id })
+            assertEquals(listOf("a", "b"), restored.collection.map { item -> item.coffee.id })
         }
 
     @Test

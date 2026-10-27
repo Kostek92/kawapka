@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CollectionDao {
-    @Query("SELECT * FROM collection_entries ORDER BY dateAdded DESC, catalogueId ASC")
+    @Query("SELECT * FROM collection_entries")
     fun observeEntries(): Flow<List<CollectionEntryEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
