@@ -9,6 +9,7 @@ import com.application.kawapka.data.collection.CollectionRepository
 import com.application.kawapka.ui.catalogue.CatalogueItemUiState
 import com.application.kawapka.ui.catalogue.filterCatalogue
 import com.application.kawapka.ui.collection.CollectionItemUiState
+import com.application.kawapka.ui.collection.filterCollection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,7 @@ data class HomeUiState(
     val catalogue: List<CatalogueItemUiState> = emptyList(),
     val collection: List<CollectionItemUiState> = emptyList(),
     val catalogueQuery: String = "",
+    val collectionQuery: String = "",
 )
 
 class HomeViewModel(
@@ -28,10 +30,15 @@ class HomeViewModel(
 ) : ViewModel() {
     private val catalogue = catalogueRepository.coffees()
     private val catalogueQuery = MutableStateFlow("")
+    private val collectionQuery = MutableStateFlow("")
 
     val uiState: StateFlow<HomeUiState> =
-        combine(collectionRepository.entries, catalogueQuery) { entries, query ->
-            buildHomeUiState(catalogue, entries, query)
+        combine(
+            collectionRepository.entries,
+            catalogueQuery,
+            collectionQuery,
+        ) { entries, catalogueQuery, collectionQuery ->
+            buildHomeUiState(catalogue, entries, catalogueQuery, collectionQuery)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -40,6 +47,10 @@ class HomeViewModel(
 
     fun setCatalogueQuery(query: String) {
         catalogueQuery.value = query
+    }
+
+    fun setCollectionQuery(query: String) {
+        collectionQuery.value = query
     }
 
     fun addToCollection(catalogueId: String) {
@@ -66,14 +77,16 @@ class HomeViewModel(
  * Combines the shared catalogue with personal collection entries.
  *
  * [catalogueQuery] filters the catalogue by coffee name in
- * [filterCatalogue]; collection contents are independent of it. Entries whose
- * catalogue id is no longer in the snapshot stay in Room but are not rendered;
- * this keeps personal data safe across catalogue refreshes.
+ * [filterCatalogue] and [collectionQuery] does the same for the personal
+ * collection in [filterCollection]. The two queries are independent. Entries
+ * whose catalogue id is no longer in the snapshot stay in Room but are not
+ * rendered; this keeps personal data safe across catalogue refreshes.
  */
 internal fun buildHomeUiState(
     catalogue: List<CatalogueCoffee>,
     entries: List<CollectionEntry>,
     catalogueQuery: String = "",
+    collectionQuery: String = "",
 ): HomeUiState {
     val collectionIds = entries.mapTo(mutableSetOf()) { it.catalogueId }
     val coffeesById = catalogue.associateBy { it.id }
@@ -89,17 +102,20 @@ internal fun buildHomeUiState(
             )
         }
 
+    val collectionItems =
+        orderedEntries.mapNotNull { entry ->
+            coffeesById[entry.catalogueId]?.let { coffee ->
+                CollectionItemUiState(
+                    coffee = coffee,
+                    rating = entry.rating,
+                )
+            }
+        }
+
     return HomeUiState(
         catalogue = filterCatalogue(catalogueItems, catalogueQuery),
-        collection =
-            orderedEntries.mapNotNull { entry ->
-                coffeesById[entry.catalogueId]?.let { coffee ->
-                    CollectionItemUiState(
-                        coffee = coffee,
-                        rating = entry.rating,
-                    )
-                }
-            },
+        collection = filterCollection(collectionItems, collectionQuery),
         catalogueQuery = catalogueQuery,
+        collectionQuery = collectionQuery,
     )
 }

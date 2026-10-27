@@ -137,6 +137,42 @@ class HomeViewModelTest {
         }
 
     @Test
+    fun `setting a collection query filters the collection and clearing it restores every coffee`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+            viewModel.addToCollection("a")
+            viewModel.addToCollection("b")
+
+            viewModel.setCollectionQuery("BR")
+
+            val filtered = viewModel.uiState.value
+            assertEquals("BR", filtered.collectionQuery)
+            assertEquals(listOf("b"), filtered.collection.map { item -> item.coffee.id })
+            assertEquals(3, filtered.catalogue.size)
+
+            viewModel.setCollectionQuery("")
+
+            val restored = viewModel.uiState.value
+            assertEquals("", restored.collectionQuery)
+            assertEquals(listOf("b", "a"), restored.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
+    fun `catalogue and collection queries filter their own tabs independently`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+            viewModel.addToCollection("a")
+            viewModel.addToCollection("b")
+
+            viewModel.setCatalogueQuery("alp")
+            viewModel.setCollectionQuery("bra")
+
+            val state = viewModel.uiState.value
+            assertEquals(listOf("a"), state.catalogue.map { item -> item.coffee.id })
+            assertEquals(listOf("b"), state.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
     fun `collection entries survive a catalogue repository change`() =
         runTest {
             val repository = FakeCollectionRepository(listOf(CollectionEntry(catalogueId = "a", dateAdded = 10)))

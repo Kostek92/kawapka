@@ -44,11 +44,15 @@ import androidx.compose.ui.unit.dp
 import com.application.kawapka.R
 import com.application.kawapka.data.catalogue.DummyCatalogue
 import com.application.kawapka.ui.catalogue.CoffeeCard
+import com.application.kawapka.ui.components.CoffeeSearchField
+import com.application.kawapka.ui.components.CoffeeSearchNoResultsState
 import com.application.kawapka.ui.theme.KawapkaTheme
 
 @Composable
 fun CollectionScreen(
     items: List<CollectionItemUiState>,
+    query: String,
+    onQueryChange: (String) -> Unit,
     onRemove: (String) -> Unit,
     onBrowseCatalogue: () -> Unit,
     onSetRating: (String, Float) -> Unit,
@@ -58,18 +62,46 @@ fun CollectionScreen(
     var ratingCoffeeId by rememberSaveable { mutableStateOf<String?>(null) }
     val ratingItem = items.firstOrNull { item -> item.coffee.id == ratingCoffeeId }
 
-    if (items.isEmpty()) {
-        CollectionEmptyState(
-            onBrowseCatalogue = onBrowseCatalogue,
-            modifier = modifier.fillMaxSize(),
+    Column(modifier = modifier.fillMaxSize()) {
+        CoffeeSearchField(
+            query = query,
+            onQueryChange = onQueryChange,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 12.dp),
         )
-    } else {
-        CollectionGrid(
-            items = items,
-            onRemove = onRemove,
-            onRateClick = { coffeeId -> ratingCoffeeId = coffeeId },
-            modifier = modifier.fillMaxSize(),
-        )
+        when {
+            items.isNotEmpty() ->
+                CollectionGrid(
+                    items = items,
+                    onRemove = onRemove,
+                    onRateClick = { coffeeId -> ratingCoffeeId = coffeeId },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                )
+
+            query.isNotBlank() ->
+                CoffeeSearchNoResultsState(
+                    query = query,
+                    onClearQuery = { onQueryChange("") },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                )
+
+            else ->
+                CollectionEmptyState(
+                    onBrowseCatalogue = onBrowseCatalogue,
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                )
+        }
     }
 
     if (ratingItem != null) {
@@ -92,7 +124,7 @@ private fun CollectionGrid(
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -236,11 +268,28 @@ private fun CollectionEmptyState(
 @Preview(showBackground = true)
 @Composable
 private fun CollectionScreenPreview() {
-    val coffees = DummyCatalogue.coffees.take(4)
-    val ratings = listOf<Float?>(null, 3f, 4.5f, 5f)
     KawapkaTheme {
         CollectionScreen(
-            items = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) },
+            items = previewCollectionItems(),
+            query = "",
+            onQueryChange = {},
+            onRemove = {},
+            onBrowseCatalogue = {},
+            onSetRating = { _, _ -> },
+            onClearRating = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CollectionScreenFilteredPreview() {
+    val items = previewCollectionItems()
+    KawapkaTheme {
+        CollectionScreen(
+            items = filterCollection(items, "Ispirazione"),
+            query = "Ispirazione",
+            onQueryChange = {},
             onRemove = {},
             onBrowseCatalogue = {},
             onSetRating = { _, _ -> },
@@ -255,10 +304,18 @@ private fun CollectionScreenEmptyPreview() {
     KawapkaTheme {
         CollectionScreen(
             items = emptyList(),
+            query = "",
+            onQueryChange = {},
             onRemove = {},
             onBrowseCatalogue = {},
             onSetRating = { _, _ -> },
             onClearRating = {},
         )
     }
+}
+
+private fun previewCollectionItems(): List<CollectionItemUiState> {
+    val coffees = DummyCatalogue.coffees.take(4)
+    val ratings = listOf<Float?>(null, 3f, 4.5f, 5f)
+    return coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) }
 }

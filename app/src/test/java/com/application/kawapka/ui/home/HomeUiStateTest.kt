@@ -119,6 +119,71 @@ class HomeUiStateTest {
     }
 
     @Test
+    fun `collection query filters the collection but leaves the catalogue untouched`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries =
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20),
+                    ),
+                collectionQuery = "br",
+            )
+
+        assertEquals("br", state.collectionQuery)
+        assertEquals(listOf("b"), state.collection.map { item -> item.coffee.id })
+        assertEquals(coffees, state.catalogue.map { item -> item.coffee })
+    }
+
+    @Test
+    fun `blank collection query returns the whole collection`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries =
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20),
+                    ),
+                collectionQuery = "   ",
+            )
+
+        assertEquals(listOf("b", "a"), state.collection.map { item -> item.coffee.id })
+    }
+
+    @Test
+    fun `collection query with no matches yields an empty collection`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries = listOf(CollectionEntry(catalogueId = "a", dateAdded = 10)),
+                collectionQuery = "zulu",
+            )
+
+        assertTrue(state.collection.isEmpty())
+        assertEquals(3, state.catalogue.size)
+    }
+
+    @Test
+    fun `catalogue and collection queries are independent`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries =
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20),
+                    ),
+                catalogueQuery = "alp",
+                collectionQuery = "bra",
+            )
+
+        assertEquals(listOf("a"), state.catalogue.map { item -> item.coffee.id })
+        assertEquals(listOf("b"), state.collection.map { item -> item.coffee.id })
+    }
+
+    @Test
     fun `empty catalogue is safe`() {
         val state =
             buildHomeUiState(
