@@ -82,6 +82,7 @@ fun CollectionScreen(
             items.isNotEmpty() ->
                 CollectionGrid(
                     items = items,
+                    query = query,
                     onRemove = onRemove,
                     onRateClick = { coffeeId -> ratingCoffeeId = coffeeId },
                     sort = sort,
@@ -125,13 +126,16 @@ fun CollectionScreen(
 @Composable
 private fun CollectionGrid(
     items: List<CollectionItemUiState>,
+    query: String,
     onRemove: (String) -> Unit,
     onRateClick: (String) -> Unit,
     sort: CollectionSort,
     modifier: Modifier = Modifier,
 ) {
     val gridState = rememberLazyGridState()
-    LaunchedEffect(sort) { gridState.scrollToItem(0) }
+    // A new result set starts at its first item; otherwise clearing a search
+    // keeps the previous result's position deep in the full list.
+    LaunchedEffect(sort, query) { gridState.scrollToItem(0) }
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         state = gridState,
@@ -286,7 +290,7 @@ private fun CollectionEmptyState(
 private fun CollectionScreenPreview() {
     KawapkaTheme {
         CollectionScreen(
-            items = previewCollectionItems(),
+            items = sortCollection(previewCollectionItems(), CollectionSort.Name),
             query = "",
             onQueryChange = {},
             onRemove = {},
@@ -304,7 +308,7 @@ private fun CollectionScreenFilteredPreview() {
     val items = previewCollectionItems()
     KawapkaTheme {
         CollectionScreen(
-            items = filterCollection(items, "Ispirazione"),
+            items = sortCollection(filterCollection(items, "Ispirazione"), CollectionSort.Name),
             query = "Ispirazione",
             onQueryChange = {},
             onRemove = {},
@@ -312,6 +316,23 @@ private fun CollectionScreenFilteredPreview() {
             onSetRating = { _, _ -> },
             onClearRating = {},
             sort = CollectionSort.Name,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CollectionScreenRatingSortedPreview() {
+    KawapkaTheme {
+        CollectionScreen(
+            items = sortCollection(previewCollectionItems(), CollectionSort.RatingDescending),
+            query = "",
+            onQueryChange = {},
+            onRemove = {},
+            onBrowseCatalogue = {},
+            onSetRating = { _, _ -> },
+            onClearRating = {},
+            sort = CollectionSort.RatingDescending,
         )
     }
 }
@@ -334,7 +355,9 @@ private fun CollectionScreenEmptyPreview() {
 }
 
 private fun previewCollectionItems(): List<CollectionItemUiState> {
-    val coffees = DummyCatalogue.coffees.take(4)
-    val ratings = listOf<Float?>(null, 3f, 4.5f, 5f)
+    val coffees =
+        DummyCatalogue.coffees.take(3) +
+            DummyCatalogue.coffees.first { coffee -> coffee.intensity == null }
+    val ratings = listOf<Float?>(4.5f, 3f, null, 5f)
     return coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) }
 }

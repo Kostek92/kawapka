@@ -62,6 +62,7 @@ fun CatalogueScreen(
             items.isNotEmpty() ->
                 CatalogueGrid(
                     items = items,
+                    query = query,
                     onAdd = onAdd,
                     sort = sort,
                     modifier =
@@ -94,12 +95,15 @@ fun CatalogueScreen(
 @Composable
 private fun CatalogueGrid(
     items: List<CatalogueItemUiState>,
+    query: String,
     onAdd: (String) -> Unit,
     sort: CatalogueSort,
     modifier: Modifier = Modifier,
 ) {
     val gridState = rememberLazyGridState()
-    LaunchedEffect(sort) { gridState.scrollToItem(0) }
+    // A new result set starts at its first item; otherwise clearing a search
+    // keeps the previous result's position deep in the full list.
+    LaunchedEffect(sort, query) { gridState.scrollToItem(0) }
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         state = gridState,
@@ -251,6 +255,21 @@ private fun CatalogueScreenFilteredPreview() {
 
 @Preview(showBackground = true)
 @Composable
+private fun CatalogueScreenIntensitySortedPreview() {
+    val items = previewCatalogueItems()
+    KawapkaTheme {
+        CatalogueScreen(
+            items = sortCatalogue(items, CatalogueSort.IntensityDescending),
+            query = "",
+            onQueryChange = {},
+            onAdd = {},
+            sort = CatalogueSort.IntensityDescending,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun CatalogueScreenNoResultsPreview() {
     val query = "Zulu"
     KawapkaTheme {
@@ -279,6 +298,7 @@ private fun CatalogueScreenEmptyPreview() {
 }
 
 private fun previewCatalogueItems(): List<CatalogueItemUiState> =
-    DummyCatalogue.coffees.mapIndexed { index, coffee ->
-        CatalogueItemUiState(coffee = coffee, isInCollection = index % 3 == 0)
-    }
+    DummyCatalogue.coffees
+        .mapIndexed { index, coffee ->
+            CatalogueItemUiState(coffee = coffee, isInCollection = index % 3 == 0)
+        }.let { items -> sortCatalogue(items, CatalogueSort.Name) }

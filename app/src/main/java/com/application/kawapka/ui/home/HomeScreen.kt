@@ -24,10 +24,12 @@ import com.application.kawapka.ui.catalogue.CatalogueItemUiState
 import com.application.kawapka.ui.catalogue.CatalogueScreen
 import com.application.kawapka.ui.catalogue.CatalogueSort
 import com.application.kawapka.ui.catalogue.CatalogueSortAction
+import com.application.kawapka.ui.catalogue.sortCatalogue
 import com.application.kawapka.ui.collection.CollectionItemUiState
 import com.application.kawapka.ui.collection.CollectionScreen
 import com.application.kawapka.ui.collection.CollectionSort
 import com.application.kawapka.ui.collection.CollectionSortAction
+import com.application.kawapka.ui.collection.sortCollection
 import com.application.kawapka.ui.theme.KawapkaTheme
 
 enum class HomeTab(
@@ -147,6 +149,26 @@ private fun HomeScreenCataloguePreview() {
 
 @Preview(showBackground = true)
 @Composable
+private fun HomeScreenCatalogueSortedPreview() {
+    KawapkaTheme {
+        HomeScreen(
+            selectedTab = HomeTab.Catalogue,
+            uiState = previewState(catalogueSort = CatalogueSort.IntensityDescending),
+            onTabSelected = {},
+            onCatalogueQueryChange = {},
+            onCollectionQueryChange = {},
+            onCatalogueSortChange = {},
+            onCollectionSortChange = {},
+            onAddToCollection = {},
+            onRemoveFromCollection = {},
+            onSetRating = { _, _ -> },
+            onClearRating = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun HomeScreenCollectionPreview() {
     KawapkaTheme {
         HomeScreen(
@@ -165,12 +187,61 @@ private fun HomeScreenCollectionPreview() {
     }
 }
 
-private fun previewState(): HomeUiState {
-    val coffees = DummyCatalogue.coffees.take(4)
-    val ratings = listOf<Float?>(null, 3f, 4.5f, 5f)
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenCollectionSortedPreview() {
+    KawapkaTheme {
+        HomeScreen(
+            selectedTab = HomeTab.Collection,
+            uiState = previewState(collectionSort = CollectionSort.RatingDescending),
+            onTabSelected = {},
+            onCatalogueQueryChange = {},
+            onCollectionQueryChange = {},
+            onCatalogueSortChange = {},
+            onCollectionSortChange = {},
+            onAddToCollection = {},
+            onRemoveFromCollection = {},
+            onSetRating = { _, _ -> },
+            onClearRating = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenEmptyCollectionPreview() {
+    KawapkaTheme {
+        HomeScreen(
+            selectedTab = HomeTab.Collection,
+            uiState = HomeUiState(hasCatalogueItems = true, hasCollectionItems = false),
+            onTabSelected = {},
+            onCatalogueQueryChange = {},
+            onCollectionQueryChange = {},
+            onCatalogueSortChange = {},
+            onCollectionSortChange = {},
+            onAddToCollection = {},
+            onRemoveFromCollection = {},
+            onSetRating = { _, _ -> },
+            onClearRating = {},
+        )
+    }
+}
+
+private fun previewState(
+    catalogueSort: CatalogueSort = CatalogueSort.Name,
+    collectionSort: CollectionSort = CollectionSort.Name,
+): HomeUiState {
+    val coffees =
+        DummyCatalogue.coffees.take(3) +
+            DummyCatalogue.coffees.first { coffee -> coffee.intensity == null }
+    val ratings = listOf<Float?>(4.5f, 3f, null, 5f)
+    val catalogueItems = coffees.map { coffee -> CatalogueItemUiState(coffee = coffee, isInCollection = true) }
+    val collectionItems = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) }
     return HomeUiState(
-        catalogue = coffees.map { coffee -> CatalogueItemUiState(coffee = coffee, isInCollection = true) },
-        collection = coffees.zip(ratings) { coffee, rating -> CollectionItemUiState(coffee = coffee, rating = rating) },
+        catalogue = sortCatalogue(catalogueItems, catalogueSort),
+        collection = sortCollection(collectionItems, collectionSort),
+        catalogueSort = catalogueSort,
+        collectionSort = collectionSort,
         hasCatalogueItems = true,
         hasCollectionItems = true,
     )

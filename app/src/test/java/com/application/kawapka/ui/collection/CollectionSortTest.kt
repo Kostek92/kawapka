@@ -2,6 +2,7 @@ package com.application.kawapka.ui.collection
 
 import com.application.kawapka.data.catalogue.CatalogueCoffee
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -81,6 +82,37 @@ class CollectionSortTest {
             listOf("alpha", "charlie", "delta"),
             ids(sortCollection(items, CollectionSort.RatingDescending)),
         )
+    }
+
+    @Test
+    fun `equal intensities break ties by name`() {
+        val items =
+            listOf(
+                CollectionItemUiState(CatalogueCoffee(id = "delta", name = "Delta", intensity = 9), rating = null),
+                CollectionItemUiState(CatalogueCoffee(id = "alpha", name = "Alpha", intensity = 9), rating = null),
+                CollectionItemUiState(CatalogueCoffee(id = "charlie", name = "Charlie", intensity = 9), rating = null),
+            )
+
+        assertEquals(
+            listOf("alpha", "charlie", "delta"),
+            ids(sortCollection(items, CollectionSort.IntensityDescending)),
+        )
+    }
+
+    @Test
+    fun `rating sort keeps unrated coffees unrated and last`() {
+        val items =
+            listOf(
+                item("alpha", rating = 0.5f),
+                item("bravo", rating = null),
+                item("charlie", rating = null),
+            )
+
+        val sorted = sortCollection(items, CollectionSort.RatingDescending)
+
+        assertEquals(listOf("alpha", "bravo", "charlie"), ids(sorted))
+        assertNull(sorted[1].rating)
+        assertNull(sorted[2].rating)
     }
 
     @Test
