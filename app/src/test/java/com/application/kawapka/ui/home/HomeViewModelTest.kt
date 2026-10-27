@@ -105,6 +105,38 @@ class HomeViewModelTest {
         }
 
     @Test
+    fun `setting a query filters the catalogue and clearing it restores every coffee`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+
+            viewModel.setCatalogueQuery("AL")
+
+            val filtered = viewModel.uiState.value
+            assertEquals("AL", filtered.catalogueQuery)
+            assertEquals(listOf("a"), filtered.catalogue.map { item -> item.coffee.id })
+
+            viewModel.setCatalogueQuery("")
+
+            val restored = viewModel.uiState.value
+            assertEquals("", restored.catalogueQuery)
+            assertEquals(coffees, restored.catalogue.map { item -> item.coffee })
+        }
+
+    @Test
+    fun `query keeps collection membership and contents`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+            viewModel.addToCollection("a")
+
+            viewModel.setCatalogueQuery("alp")
+
+            val state = viewModel.uiState.value
+            assertEquals("alp", state.catalogueQuery)
+            assertTrue(state.catalogue.single().isInCollection)
+            assertEquals(listOf("a"), state.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
     fun `collection entries survive a catalogue repository change`() =
         runTest {
             val repository = FakeCollectionRepository(listOf(CollectionEntry(catalogueId = "a", dateAdded = 10)))
