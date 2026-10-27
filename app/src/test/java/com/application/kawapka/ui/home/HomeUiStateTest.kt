@@ -42,7 +42,7 @@ class HomeUiStateTest {
     }
 
     @Test
-    fun `collection is newest first with a stable id tie breaker`() {
+    fun `collection follows repository entry order`() {
         val state =
             buildHomeUiState(
                 coffees,
@@ -53,7 +53,7 @@ class HomeUiStateTest {
                 ),
             )
 
-        assertEquals(listOf("c", "a", "b"), state.collection.map { item -> item.coffee.id })
+        assertEquals(listOf("b", "c", "a"), state.collection.map { item -> item.coffee.id })
         assertFalse(state.collection.any { item -> item.coffee.id == "missing" })
     }
 
@@ -149,7 +149,7 @@ class HomeUiStateTest {
                 collectionQuery = "   ",
             )
 
-        assertEquals(listOf("b", "a"), state.collection.map { item -> item.coffee.id })
+        assertEquals(listOf("a", "b"), state.collection.map { item -> item.coffee.id })
     }
 
     @Test
