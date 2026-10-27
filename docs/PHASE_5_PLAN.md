@@ -1,7 +1,6 @@
 # Phase 5 implementation plan — Search and sorting
 
-**Status:** In progress. 5.1–5.4 are implemented; 5.5 is in progress; 5.6
-remains.
+**Status:** In progress. 5.1–5.5 are implemented; 5.6 remains.
 
 **Roadmap:** This phase replaces the former separate search (old Phase 6) and
 sorting (old Phase 7) phases. Favourites remains skipped for the first release;
@@ -245,6 +244,8 @@ Browse and My Coffees.
   update the My Coffees strings as needed.
 - Add previews for both actions, with a selected sort, an unrated coffee, and a
   coffee without an intensity.
+- Reset the grid scroll position to the top when the selected sort changes, so
+  the new order starts from its first item.
 - Keep the rating sheet working when the order changes; it already looks up its
   coffee by id.
 
