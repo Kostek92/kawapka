@@ -241,6 +241,20 @@ private fun CatalogueScreenFilteredPreview() {
 
 @Preview(showBackground = true)
 @Composable
+private fun CatalogueScreenNoResultsPreview() {
+    val query = "Zulu"
+    KawapkaTheme {
+        CatalogueScreen(
+            items = filterCatalogue(previewCatalogueItems(), query),
+            query = query,
+            onQueryChange = {},
+            onAdd = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun CatalogueScreenEmptyPreview() {
     KawapkaTheme {
         CatalogueScreen(

@@ -1,6 +1,6 @@
 # Phase 5 implementation plan — Search and sorting
 
-**Status:** Planned; not implemented.
+**Status:** In progress. 5.1–5.3 are implemented and verified; 5.4–5.6 remain.
 
 **Roadmap:** This phase replaces the former separate search (old Phase 6) and
 sorting (old Phase 7) phases. Favourites remains skipped for the first release;
