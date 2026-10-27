@@ -74,41 +74,36 @@ detail screen.
 including half-star values such as 4.5, survive an app restart and a catalogue
 refresh, and an unrated coffee is never treated as a zero-star rating.
 
-## Phase 5 — Favourites (skipped)
+## Phase 5 — Search and sorting
 
-**Decision:** Skipped. The first release has no favourite status and no
-favourites screen; collection membership and ratings are the only personal
-state. The prototype in `docs/prototype/` still shows a favourites flow, so that
-screen is outdated.
-
-## Phase 6 — Search and add from results
-
-**Goal:** Make it quick to find a coffee in a growing catalogue.
+**Goal:** Make it quick to find a coffee in a growing catalogue and keep the
+personal collection manageable.
 
 **Rules:** `PRODUCT_SPEC.md` §5.
 
-- Search by coffee name and indicate whether each result is already in the
-  collection.
-- Add a result directly from search.
-- Provide a no-results state and a way to clear the query.
+Favourites remains skipped for the first release; see `PRODUCT_SPEC.md` §2. This
+phase combines the former search and sorting phases. Deliver it in the
+increments below, each independently buildable and verifiable. The detailed
+plan lives in [`PHASE_5_PLAN.md`](PHASE_5_PLAN.md).
 
-**Complete when:** A user can find and add a known coffee without manually
-browsing the entire catalogue.
+- **5.1 Search state and filtering** — case-insensitive name search behind the
+  ViewModel; no UI change yet.
+- **5.2 Search bar** — add the search field, clear action, and no-results
+  handling to the Catalogue tab.
+- **5.3 Search result tiles and add from results** — filtered results reuse the
+  catalogue tile, keep the membership indicator, and can be added directly.
+- **5.4 Sort model and comparators** — name, rating (both directions), and date
+  added (both directions); unrated after rated; stable tie-breaker.
+- **5.5 Sort control** — visible active sort on My Coffees with a menu to
+  change it.
+- **5.6 Hardening and verification** — tests, previews, docs, and the
+  `phase-verification` checklist.
 
-## Phase 7 — Sorting
+**Complete when:** A user can find a known coffee by name and add it without
+manually browsing the entire catalogue, and can sort My Coffees by name, rating,
+or date added with unrated coffees last and a visible active sort.
 
-**Goal:** Keep the collection manageable.
-
-**Rules:** `PRODUCT_SPEC.md` §5.
-
-- Sort by name, rating (both directions), and date added (both directions);
-  unrated coffees go after rated coffees.
-- Make the active sort option visible and use a predictable tie-breaker.
-
-**Complete when:** Sorting behaves consistently for rated, unrated, and equally
-sorted coffees.
-
-## Phase 8 — Optional coffee details
+## Phase 6 — Optional coffee details
 
 **Rules:** `PRODUCT_SPEC.md` §2 (explicitly deferred).
 
@@ -124,7 +119,7 @@ delivered separately:
 **Complete when:** Each chosen addition has a clear user benefit and does not
 destabilise the core collection and rating flows.
 
-## Phase 9 — Profiles and comparison
+## Phase 7 — Profiles and comparison
 
 **Rules:** `PRODUCT_SPEC.md` §6.
 
