@@ -105,6 +105,20 @@ class HomeUiStateTest {
     }
 
     @Test
+    fun `catalogue query filters the catalogue but leaves the collection untouched`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries = listOf(CollectionEntry(catalogueId = "c", dateAdded = 10)),
+                catalogueQuery = "br",
+            )
+
+        assertEquals("br", state.catalogueQuery)
+        assertEquals(listOf("b"), state.catalogue.map { item -> item.coffee.id })
+        assertEquals(listOf("c"), state.collection.map { item -> item.coffee.id })
+    }
+
+    @Test
     fun `empty catalogue is safe`() {
         val state =
             buildHomeUiState(
