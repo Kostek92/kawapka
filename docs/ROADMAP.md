@@ -92,16 +92,18 @@ plan lives in [`PHASE_5_PLAN.md`](PHASE_5_PLAN.md).
   handling to the Catalogue tab.
 - **5.3 Search result tiles and add from results** — filtered results reuse the
   catalogue tile, keep the membership indicator, and can be added directly.
-- **5.4 Sort model and comparators** — name, rating (both directions), and date
-  added (both directions); unrated after rated; stable tie-breaker.
+- **5.4 Sort model and comparators** — name, intensity (highest first), and
+  rating (highest first); missing intensity and unrated last; stable
+  tie-breaker.
 - **5.5 Sort control** — visible active sort on My Coffees with a menu to
   change it.
 - **5.6 Hardening and verification** — tests, previews, docs, and the
   `phase-verification` checklist.
 
 **Complete when:** A user can find a known coffee by name and add it without
-manually browsing the entire catalogue, and can sort My Coffees by name, rating,
-or date added with unrated coffees last and a visible active sort.
+manually browsing the entire catalogue, and can sort My Coffees by name,
+intensity, or rating with missing intensity and unrated coffees last and a
+visible active sort.
 
 ## Phase 6 — Optional coffee details
 

@@ -28,15 +28,21 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   `GeneratedCatalogueRepository`; `DummyCatalogue` stays as the preview/test
   fixture. Catalogue models carry no personal state. Personal state sits behind
   `CollectionRepository` (Room-backed in production) and keys off the stable
-  `CatalogueCoffee.id`; collection rows store the catalogue id, date added, and
-  personal fields such as the optional 0.5–5 rating in half-star increments
-  (never zero stars for unrated), never a copy of catalogue data.
+  `CatalogueCoffee.id`; collection rows store the catalogue id and personal
+  fields such as the optional 0.5–5 rating in half-star increments (never zero
+  stars for unrated), never a copy of catalogue data. The legacy `dateAdded`
+  column no longer affects ordering or is shown; remove it in a future database
+  migration.
   `KawapkaApplication` owns the database and repository graph.
   `HomeRoute`/`HomeScreen` host the two top-level tabs (`Catalogue`,
   `My Coffees`) and save the selected tab with Compose state. My Coffees shows a
   compact rating pill per card; tapping it opens a modal rating sheet with 40dp
   stars. Tapping a star's left or right half sets a half or whole value; whole
-  values display as `4/5`, half values as `4.5/5`.
+  values display as `4/5`, half values as `4.5/5`. Catalogue and collection
+  search queries plus the collection sort are in-memory `HomeViewModel` state,
+  not Room data, so they reset on app restart. Sort options are name (default),
+  intensity high→low, and rating high→low, with missing intensity and unrated
+  coffees last.
   Screens use `lifecycle-viewmodel-compose` and `lifecycle-runtime-compose` for
   Route/ViewModel state collection.
 - `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the
@@ -63,7 +69,8 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   the script intentionally leaves the app code untouched.
 - `./gradlew test` — JVM unit tests for pure logic (half-star rating validation,
   formatting, set/change/clear, sort comparators, snapshot/stable-id mapping,
-  collection membership and date-added ordering). Add tests as that logic lands.
+  collection membership, search filtering, and name/intensity/rating sorting).
+  Add tests as that logic lands.
 - Verification of user-visible work = successful build + install + launch on the
   physical phone (`adb shell am start -n <applicationId>/.MainActivity`).
 - Kotlin IntelliSense (JetBrains `kotlin-server`) needs a successful Gradle

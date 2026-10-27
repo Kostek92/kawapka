@@ -1,6 +1,6 @@
 # Phase 5 implementation plan — Search and sorting
 
-**Status:** In progress. 5.1–5.3 are implemented and verified; 5.4–5.6 remain.
+**Status:** In progress. 5.1–5.4 are implemented; 5.5–5.6 remain.
 
 **Roadmap:** This phase replaces the former separate search (old Phase 6) and
 sorting (old Phase 7) phases. Favourites remains skipped for the first release;
@@ -14,7 +14,7 @@ collection manageable:
 - Find a catalogue coffee by name.
 - See whether a search result is already in My Coffees.
 - Add a coffee directly from search results.
-- Sort My Coffees by name, rating, or date added.
+- Sort My Coffees by name, intensity, or rating.
 
 The phase is deliberately split into small increments. Each increment should be
 independently buildable and verifiable, and should end with
@@ -34,11 +34,10 @@ phone.
 - A visible no-results state with a way to clear the query.
 - Sorting My Coffees by:
   - name, A–Z;
-  - rating, high to low;
-  - rating, low to high;
-  - date added, newest first;
-  - date added, oldest first.
-- Unrated coffees appear after rated coffees in both rating directions.
+  - intensity, high to low;
+  - rating, high to low.
+- Coffees without an intensity appear after those with a value.
+- Unrated coffees appear after rated coffees.
 - A visible active sort option and a stable tie-breaker.
 
 ### Out of scope
@@ -48,6 +47,8 @@ phone.
 - Filters (intensity, cup size, decaf, unrated-only, etc.).
 - A coffee detail screen.
 - Persisting the search query or sort choice in Room.
+- Sorting by date added. Date added is legacy storage only and is not displayed
+  or used for ordering.
 - Sorting the catalogue or search results. Sorting applies only to My Coffees,
   as specified in `PRODUCT_SPEC.md` §5.
 - Diacritic folding (for example matching `zbozowy` to `zbożowy`). Search is
@@ -59,13 +60,14 @@ phone.
 - Search and sort state live in `HomeViewModel`, not in composables. They
   survive tab switches and configuration changes; they reset on app restart.
   Persisting them is not required.
-- The default collection sort stays newest-added first, which preserves the
-  current behaviour.
+- The default collection sort is name, A–Z.
 - Every sort ends with a stable tie-breaker. Name sorts use the coffee id;
-  rating and date sorts use the coffee name (case-insensitive) and then the
+  intensity and rating sorts use the coffee name (case-insensitive) and then the
   coffee id. This makes equal values predictable without relying on input order.
-- `dateAdded` is carried into `CollectionItemUiState` so sorting can be a pure
-  function over the UI list. It is not displayed in the UI.
+- Missing intensity and unrated coffees always sort after present values.
+- `dateAdded` stays in Room for backwards compatibility only. It is no longer
+  carried into `CollectionItemUiState` or used for ordering, and should be
+  removed in a future database migration.
 - The search bar is only on the Catalogue tab. The sort control is only on My
   Coffees and is hidden when the collection is empty.
 
@@ -165,41 +167,40 @@ items correctly, with no visible sort control yet.
 
 **Changes:**
 
-- Add a `CollectionSort` enum with:
-  `Name`, `RatingDescending`, `RatingAscending`, `DateAddedNewest`, and
-  `DateAddedOldest`.
-- Add `collectionSort` to `HomeUiState`, defaulting to `DateAddedNewest`.
+- Add a `CollectionSort` enum with `Name`, `IntensityDescending`, and
+  `RatingDescending`.
+- Add `collectionSort` to `HomeUiState`, defaulting to `Name`.
 - Add a pure sort helper in `ui/collection/` that sorts collection UI items by
   the selected option.
-- Carry `dateAdded` from `CollectionEntry` into `CollectionItemUiState`, and
-  update its KDoc, previews, and test fixtures for the new field.
 - Add `setCollectionSort(sort)` to `HomeViewModel` and include the selected sort
   when building `HomeUiState`.
 - Apply sorting after mapping entries to catalogue coffees, so entries whose
   catalogue product disappeared remain safely hidden.
+- Remove date-added ordering from the state and DAO query. Keep the
+  `dateAdded` column and value for now, with a note to delete it in a future
+  database migration.
 
 **Sorting rules:**
 
 - Name: case-insensitive name ascending, then id.
-- Rating descending: rated coffees first, highest first; unrated after all
-  rated; ties by name, then id.
-- Rating ascending: rated coffees first, lowest first; unrated after all rated;
-  ties by name, then id.
-- Date added newest first: newest date first, then name, then id.
-- Date added oldest first: oldest date first, then name, then id.
+- Intensity: highest first; coffees without an intensity after all coffees with
+  one; ties by name, then id.
+- Rating: highest first; unrated coffees after all rated; ties by name, then id.
 - Empty lists and missing catalogue products are safe.
 
 **Tests:**
 
 - Each sort option produces the expected order.
-- Unrated coffees are last in both rating directions.
-- Equal ratings and equal dates use the documented tie-breaker.
+- Coffees without an intensity are last.
+- Unrated coffees are last.
+- A half-star rating sorts above unrated.
+- Equal intensity and equal ratings use the documented tie-breaker.
 - Name sorting is case-insensitive.
 - Missing catalogue entries are ignored and do not affect the order.
-- The default sort remains newest-added first.
+- The default sort is name, A–Z.
 
-**Done when:** Unit tests cover every sort option and the app builds with no
-visible change.
+**Done when:** Unit tests cover every sort option and the app builds with the
+collection in name order and no sort control yet.
 
 ### 5.5 — Sort control on My Coffees
 
@@ -210,13 +211,14 @@ visible change.
 - Add `sort` and `onSortChange` to `CollectionScreen`; pass them through
   `HomeScreen` and `HomeRoute` to `HomeViewModel.setCollectionSort`.
 - Add a compact header row above the collection grid showing the active sort
-  label and opening a menu with the five options. Mark the active option with a
+  label and opening a menu with the three options. Mark the active option with a
   check icon.
 - Hide the sort control when the collection is empty; the existing empty state
   remains the primary content.
 - Add strings for every sort option and for the control’s accessibility
   description.
-- Add previews with a selected sort and with an unrated coffee.
+- Add previews with a selected sort, an unrated coffee, and a coffee without an
+  intensity.
 - Keep the rating sheet working when the order changes; it already looks up its
   coffee by id.
 
@@ -242,12 +244,14 @@ verified on the phone.
   - query and sort retained while adding, removing, rating, and clearing a
     rating;
   - catalogue entries missing from the snapshot with every sort option;
+  - coffees without an intensity sorted last;
   - unrated coffees never treated as zero stars.
 - Check tab switching manually; the tab selection lives in `HomeRoute`, while
   the query and sort live in the ViewModel.
-- Update `AGENTS.md` with the search/sort state location and the decision that
-  query and sort are in-memory ViewModel state, not Room data.
-- Confirm no Room schema change or new dependency was introduced.
+- Update `AGENTS.md` with the search/sort state location, the sort options, and
+  the decision that query and sort are in-memory ViewModel state, not Room data.
+- Confirm no Room schema change or new dependency was introduced beyond the
+  `dateAdded` column remaining as legacy storage.
 - Run the `phase-verification` skill.
 
 **Manual checks on the phone:**
@@ -262,13 +266,14 @@ verified on the phone.
 - Rotate the phone; the query and sort are retained.
 - Add several coffees, rate some (including a half-star value), and leave at
   least one unrated.
-- Check every sort option. Unrated coffees stay after rated coffees in both
-  rating directions.
-- Confirm equal ratings and equal dates keep a stable order.
+- Check every sort option. Unrated coffees and coffees without an intensity
+  stay after coffees with a value.
+- Confirm equal ratings and equal intensities keep a stable order.
 - Change and clear a rating while sorted by rating; the coffee moves to the
   correct group.
-- Restart the app. Collection membership, ratings, and date-added values
-  persist; the query clears and the sort returns to the default, as expected.
+- Confirm date added is not displayed or used for ordering.
+- Restart the app. Collection membership and ratings persist; the query clears
+  and the sort returns to name order, as expected.
 - Refresh the catalogue and confirm personal data and sorting remain safe.
 - Check empty catalogue, empty collection, no search results, missing image,
   and missing optional fields.
@@ -283,8 +288,9 @@ persistence, catalogue-refresh, or edge-state failure.
 1. `Add catalogue search filtering`
 2. `Add catalogue search bar`
 3. `Complete search result states`
-4. `Add collection sort comparators`
-5. `Add collection sort control`
-6. `Verify search and sorting`
+4. `Drop date added from collection sorting`
+5. `Add collection sort comparators`
+6. `Add collection sort control`
+7. `Verify search and sorting`
 
 Each commit should leave the app buildable and the tests green.

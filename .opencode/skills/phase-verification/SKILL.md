@@ -1,6 +1,6 @@
 ---
 name: phase-verification
-description: Use after completing any phase in docs/ROADMAP.md for the coffee pod ratings app to verify it. Covers persistence of collection membership, ratings, and date-added across app restarts; catalogue-refresh safety; empty, error, and missing-data states; plus ktlint/check, JVM unit tests, build, install, and on-phone manual checks.
+description: Use after completing any phase in docs/ROADMAP.md for the coffee pod ratings app to verify it. Covers persistence of collection membership and ratings across app restarts; catalogue-refresh safety; empty, error, and missing-data states; plus ktlint/check, JVM unit tests, build, install, and on-phone manual checks.
 ---
 
 # Phase verification (coffee pod ratings)
@@ -40,10 +40,9 @@ Manually exercise these flows, restarting the app where noted:
   unrated state (never rendered as zero stars).
 - Confirm personal data is read from and written to Room (the single source of
   truth), not in-memory state.
-- Fully close and reopen the app. Collection membership, ratings, and date-added
-  values must all persist.
-- Confirm date-added sorting stays consistent for entries added at different
-  times.
+- Fully close and reopen the app. Collection membership and ratings must
+  persist.
+- Confirm the collection sort is in-memory and resets to name order on restart.
 
 ## 3. Catalogue refresh safety
 
@@ -51,8 +50,8 @@ Applies once the catalogue-download phase exists. Before then, verify that
 replacing the bundled fixture or changing the repository source leaves the Room
 data untouched.
 
-- Trigger a catalogue refresh. Personal collection membership, ratings, and
-  date-added values must be unaffected.
+- Trigger a catalogue refresh. Personal collection membership and ratings must
+  be unaffected.
 - Remove a product from the catalogue source (or simulate its disappearance) and
   refresh. A coffee that disappears from the latest catalogue must keep its
   existing personal history; do not infer discontinuation from a failed
