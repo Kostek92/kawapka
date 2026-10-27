@@ -1,6 +1,7 @@
 # Phase 5 implementation plan — Search and sorting
 
-**Status:** In progress. 5.1–5.5 are implemented; 5.6 remains.
+**Status:** Complete. 5.1–5.6 are implemented and verified on the physical
+phone.
 
 **Roadmap:** This phase replaces the former separate search (old Phase 6) and
 sorting (old Phase 7) phases. Favourites remains skipped for the first release;
@@ -89,6 +90,9 @@ phone.
   removed in a future database migration.
 - The search bar appears on both Catalogue and My Coffees. Sorting applies to
   the visible results, including filtered search results, on both tabs.
+- Changing a search query or a sort scrolls that tab's grid back to the top, so
+  a cleared query does not keep the previous result's position deep in the full
+  list.
 
 ## Increments
 
@@ -338,3 +342,30 @@ persistence, catalogue-refresh, or edge-state failure.
 9. `Verify search and sorting`
 
 Each commit should leave the app buildable and the tests green.
+
+## Verification (2026-10-27)
+
+- `./gradlew ktlintCheck`, `./gradlew test` (91 tests), `./gradlew
+  assembleDebug`, and `./gradlew installDebug` pass; the app launches on the
+  phone.
+- Search filters live by partial name and casing; description and aroma terms
+  do not match. Both the field's clear action and the no-results clear action
+  restore the full list from the top.
+- Adding from a filtered result updates the tile to Added and adds it to My
+  Coffees once; the disabled Added control prevents a duplicate.
+- Queries and sort choices are independent per tab and survive tab switches and
+  rotation. Changing or clearing a rating while sorted by rating moves the card
+  between the correct groups.
+- Both sort menus mark the active option. Catalogue intensity order puts
+  missing intensity last; My Coffees intensity and rating orders put missing
+  intensity and unrated coffees last. A 0.5-star rating stays above unrated.
+- The sort action stays visible for no-result searches. With a temporary
+  dummy-catalogue build (reverted) the production collection showed the empty
+  state with no sort action; restoring the generated catalogue brought the same
+  Room collection and ratings back, confirming catalogue-refresh safety.
+- Force-stop/relaunch preserved membership and ratings; queries cleared and
+  both sorts returned to name order.
+- No Room schema or dependency change was introduced; `dateAdded` remains
+  legacy storage only and is neither displayed nor used for ordering.
+- Empty collection, no-results, missing-image, and missing-optional-field
+  states are covered by previews and unit tests.

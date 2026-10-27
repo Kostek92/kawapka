@@ -6,6 +6,7 @@ import com.application.kawapka.ui.catalogue.CatalogueSort
 import com.application.kawapka.ui.collection.CollectionSort
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -155,6 +156,72 @@ class HomeUiStateTest {
         assertEquals(listOf("a"), state.collection.map { item -> item.coffee.id })
         assertEquals(3, state.catalogue.size)
         assertTrue(state.hasCollectionItems)
+    }
+
+    @Test
+    fun `missing catalogue entries are ignored for every collection sort`() {
+        val entries =
+            listOf(
+                CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 2f),
+                CollectionEntry(catalogueId = "missing", dateAdded = 20, rating = 5f),
+                CollectionEntry(catalogueId = "b", dateAdded = 30, rating = 4.5f),
+                CollectionEntry(catalogueId = "c", dateAdded = 40),
+            )
+        val expected =
+            mapOf(
+                CollectionSort.Name to listOf("a", "b", "c"),
+                CollectionSort.IntensityDescending to listOf("b", "a", "c"),
+                CollectionSort.RatingDescending to listOf("b", "a", "c"),
+            )
+
+        CollectionSort.entries.forEach { sort ->
+            val state =
+                buildHomeUiState(
+                    catalogue = coffeesWithIntensity,
+                    entries = entries,
+                    collectionSort = sort,
+                )
+
+            assertEquals(expected.getValue(sort), state.collection.map { item -> item.coffee.id })
+            assertTrue(state.hasCollectionItems)
+        }
+    }
+
+    @Test
+    fun `coffees without an intensity sort last on both tabs`() {
+        val entries =
+            coffeesWithIntensity.map { coffee ->
+                CollectionEntry(catalogueId = coffee.id, dateAdded = 10)
+            }
+
+        val state =
+            buildHomeUiState(
+                catalogue = coffeesWithIntensity,
+                entries = entries,
+                catalogueSort = CatalogueSort.IntensityDescending,
+                collectionSort = CollectionSort.IntensityDescending,
+            )
+
+        assertEquals(listOf("b", "a", "c"), state.catalogue.map { item -> item.coffee.id })
+        assertEquals(listOf("b", "a", "c"), state.collection.map { item -> item.coffee.id })
+    }
+
+    @Test
+    fun `unrated coffees sort after a half star and stay unrated`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries =
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20, rating = 0.5f),
+                    ),
+                collectionSort = CollectionSort.RatingDescending,
+            )
+
+        assertEquals(listOf("b", "a"), state.collection.map { item -> item.coffee.id })
+        assertEquals(0.5f, state.collection.first().rating)
+        assertNull(state.collection.last().rating)
     }
 
     @Test

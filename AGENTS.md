@@ -41,11 +41,13 @@ devcontainer (Docker). Phone-only: no emulator (WSL2 has no `/dev/kvm`).
   values display as `4/5`, half values as `4.5/5`. Catalogue and collection
   search queries plus separate catalogue and collection sorts are in-memory
   `HomeViewModel` state, not Room data, so they reset on app restart. Both tabs
-  show an icon-only top-bar sort action; its menu marks the active option.
+  show an icon-only top-bar sort action; its menu marks the active option and
+  names the current sort in its accessibility description. It is hidden when
+  the active tab has no items but stays visible while a search has no matches.
   Catalogue sorts by name (default) or intensity high→low; My Coffees also
   sorts by rating high→low. Missing intensity and unrated coffees sort last,
-  and changing a sort scrolls that grid back to the top. Both tabs share the
-  `SortAction` menu component but keep independent state.
+  and changing a sort or search query scrolls that grid back to the top. Both
+  tabs share the `SortAction` menu component but keep independent state.
   Screens use `lifecycle-viewmodel-compose` and `lifecycle-runtime-compose` for
   Route/ViewModel state collection.
 - `scripts/generate-catalogue` refreshes the bundled snapshot by fetching the

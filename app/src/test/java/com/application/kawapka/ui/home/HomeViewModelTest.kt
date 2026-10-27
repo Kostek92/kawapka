@@ -299,6 +299,65 @@ class HomeViewModelTest {
         }
 
     @Test
+    fun `queries and sorts survive adding and removing a coffee`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+            viewModel.setCatalogueQuery("alp")
+            viewModel.setCollectionQuery("alp")
+            viewModel.setCatalogueSort(CatalogueSort.IntensityDescending)
+            viewModel.setCollectionSort(CollectionSort.RatingDescending)
+
+            viewModel.addToCollection("a")
+
+            val added = viewModel.uiState.value
+            assertEquals("alp", added.catalogueQuery)
+            assertEquals("alp", added.collectionQuery)
+            assertEquals(CatalogueSort.IntensityDescending, added.catalogueSort)
+            assertEquals(CollectionSort.RatingDescending, added.collectionSort)
+            assertTrue(added.catalogue.single().isInCollection)
+            assertEquals(listOf("a"), added.collection.map { item -> item.coffee.id })
+
+            viewModel.removeFromCollection("a")
+
+            val removed = viewModel.uiState.value
+            assertEquals("alp", removed.catalogueQuery)
+            assertEquals("alp", removed.collectionQuery)
+            assertEquals(CatalogueSort.IntensityDescending, removed.catalogueSort)
+            assertEquals(CollectionSort.RatingDescending, removed.collectionSort)
+            assertFalse(removed.catalogue.single().isInCollection)
+            assertTrue(removed.collection.isEmpty())
+        }
+
+    @Test
+    fun `queries and sorts survive setting and clearing a rating`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
+            viewModel.addToCollection("a")
+            viewModel.setCatalogueQuery("alp")
+            viewModel.setCollectionQuery("alp")
+            viewModel.setCatalogueSort(CatalogueSort.IntensityDescending)
+            viewModel.setCollectionSort(CollectionSort.RatingDescending)
+
+            viewModel.setRating("a", 4.5f)
+
+            val rated = viewModel.uiState.value
+            assertEquals("alp", rated.catalogueQuery)
+            assertEquals("alp", rated.collectionQuery)
+            assertEquals(CatalogueSort.IntensityDescending, rated.catalogueSort)
+            assertEquals(CollectionSort.RatingDescending, rated.collectionSort)
+            assertEquals(4.5f, rated.collection.single().rating)
+
+            viewModel.clearRating("a")
+
+            val cleared = viewModel.uiState.value
+            assertEquals("alp", cleared.catalogueQuery)
+            assertEquals("alp", cleared.collectionQuery)
+            assertEquals(CatalogueSort.IntensityDescending, cleared.catalogueSort)
+            assertEquals(CollectionSort.RatingDescending, cleared.collectionSort)
+            assertNull(cleared.collection.single().rating)
+        }
+
+    @Test
     fun `catalogue and collection queries filter their own tabs independently`() =
         runTest {
             val viewModel = HomeViewModel(CatalogueRepository { coffees }, FakeCollectionRepository())
