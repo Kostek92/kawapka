@@ -2,6 +2,7 @@ package com.application.kawapka.ui.home
 
 import com.application.kawapka.data.catalogue.CatalogueCoffee
 import com.application.kawapka.data.collection.CollectionEntry
+import com.application.kawapka.ui.catalogue.CatalogueSort
 import com.application.kawapka.ui.collection.CollectionSort
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -16,6 +17,13 @@ class HomeUiStateTest {
             CatalogueCoffee(id = "c", name = "Charlie"),
         )
 
+    private val coffeesWithIntensity =
+        listOf(
+            CatalogueCoffee(id = "a", name = "Alpha", intensity = 3),
+            CatalogueCoffee(id = "b", name = "Bravo", intensity = 9),
+            CatalogueCoffee(id = "c", name = "Charlie"),
+        )
+
     @Test
     fun `empty collection leaves every catalogue coffee unadded`() {
         val state = buildHomeUiState(coffees, emptyList())
@@ -23,7 +31,62 @@ class HomeUiStateTest {
         assertEquals(coffees, state.catalogue.map { item -> item.coffee })
         assertTrue(state.catalogue.none { item -> item.isInCollection })
         assertTrue(state.collection.isEmpty())
+        assertTrue(state.hasCatalogueItems)
         assertFalse(state.hasCollectionItems)
+    }
+
+    @Test
+    fun `catalogue defaults to name order`() {
+        val state = buildHomeUiState(coffeesWithIntensity, emptyList())
+
+        assertEquals(CatalogueSort.Name, state.catalogueSort)
+        assertEquals(listOf("a", "b", "c"), state.catalogue.map { item -> item.coffee.id })
+    }
+
+    @Test
+    fun `selected catalogue sort orders the catalogue`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffeesWithIntensity,
+                entries = emptyList(),
+                catalogueSort = CatalogueSort.IntensityDescending,
+            )
+
+        assertEquals(CatalogueSort.IntensityDescending, state.catalogueSort)
+        assertEquals(listOf("b", "a", "c"), state.catalogue.map { item -> item.coffee.id })
+    }
+
+    @Test
+    fun `catalogue sort applies after search filtering`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffeesWithIntensity,
+                entries = emptyList(),
+                catalogueQuery = "r",
+                catalogueSort = CatalogueSort.IntensityDescending,
+            )
+
+        assertEquals(listOf("b", "c"), state.catalogue.map { item -> item.coffee.id })
+    }
+
+    @Test
+    fun `catalogue and collection sorts are independent`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffeesWithIntensity,
+                entries =
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 2f),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20, rating = 5f),
+                    ),
+                catalogueSort = CatalogueSort.IntensityDescending,
+                collectionSort = CollectionSort.RatingDescending,
+            )
+
+        assertEquals(listOf("b", "a", "c"), state.catalogue.map { item -> item.coffee.id })
+        assertEquals(listOf("b", "a"), state.collection.map { item -> item.coffee.id })
+        assertEquals(CatalogueSort.IntensityDescending, state.catalogueSort)
+        assertEquals(CollectionSort.RatingDescending, state.collectionSort)
     }
 
     @Test
@@ -201,6 +264,19 @@ class HomeUiStateTest {
     }
 
     @Test
+    fun `catalogue query with no matches keeps catalogue items flag`() {
+        val state =
+            buildHomeUiState(
+                catalogue = coffees,
+                entries = emptyList(),
+                catalogueQuery = "zulu",
+            )
+
+        assertTrue(state.catalogue.isEmpty())
+        assertTrue(state.hasCatalogueItems)
+    }
+
+    @Test
     fun `catalogue and collection queries are independent`() {
         val state =
             buildHomeUiState(
@@ -228,6 +304,7 @@ class HomeUiStateTest {
 
         assertTrue(state.catalogue.isEmpty())
         assertTrue(state.collection.isEmpty())
+        assertFalse(state.hasCatalogueItems)
         assertFalse(state.hasCollectionItems)
     }
 }

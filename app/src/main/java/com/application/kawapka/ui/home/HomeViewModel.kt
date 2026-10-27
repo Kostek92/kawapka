@@ -7,7 +7,9 @@ import com.application.kawapka.data.catalogue.CatalogueRepository
 import com.application.kawapka.data.collection.CollectionEntry
 import com.application.kawapka.data.collection.CollectionRepository
 import com.application.kawapka.ui.catalogue.CatalogueItemUiState
+import com.application.kawapka.ui.catalogue.CatalogueSort
 import com.application.kawapka.ui.catalogue.filterCatalogue
+import com.application.kawapka.ui.catalogue.sortCatalogue
 import com.application.kawapka.ui.collection.CollectionItemUiState
 import com.application.kawapka.ui.collection.CollectionSort
 import com.application.kawapka.ui.collection.filterCollection
@@ -24,7 +26,9 @@ data class HomeUiState(
     val collection: List<CollectionItemUiState> = emptyList(),
     val catalogueQuery: String = "",
     val collectionQuery: String = "",
+    val catalogueSort: CatalogueSort = CatalogueSort.Name,
     val collectionSort: CollectionSort = CollectionSort.Name,
+    val hasCatalogueItems: Boolean = false,
     val hasCollectionItems: Boolean = false,
 )
 
@@ -35,6 +39,7 @@ class HomeViewModel(
     private val catalogue = catalogueRepository.coffees()
     private val catalogueQuery = MutableStateFlow("")
     private val collectionQuery = MutableStateFlow("")
+    private val catalogueSort = MutableStateFlow(CatalogueSort.Name)
     private val collectionSort = MutableStateFlow(CollectionSort.Name)
 
     val uiState: StateFlow<HomeUiState> =
@@ -42,9 +47,17 @@ class HomeViewModel(
             collectionRepository.entries,
             catalogueQuery,
             collectionQuery,
+            catalogueSort,
             collectionSort,
-        ) { entries, catalogueQuery, collectionQuery, collectionSort ->
-            buildHomeUiState(catalogue, entries, catalogueQuery, collectionQuery, collectionSort)
+        ) { entries, catalogueQuery, collectionQuery, catalogueSort, collectionSort ->
+            buildHomeUiState(
+                catalogue = catalogue,
+                entries = entries,
+                catalogueQuery = catalogueQuery,
+                collectionQuery = collectionQuery,
+                catalogueSort = catalogueSort,
+                collectionSort = collectionSort,
+            )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -57,6 +70,10 @@ class HomeViewModel(
 
     fun setCollectionQuery(query: String) {
         collectionQuery.value = query
+    }
+
+    fun setCatalogueSort(sort: CatalogueSort) {
+        catalogueSort.value = sort
     }
 
     fun setCollectionSort(sort: CollectionSort) {
@@ -89,17 +106,20 @@ class HomeViewModel(
  * [catalogueQuery] filters the catalogue by coffee name in
  * [filterCatalogue] and [collectionQuery] does the same for the personal
  * collection in [filterCollection]. The two queries are independent.
+ * [catalogueSort] orders the filtered catalogue in [sortCatalogue], and
  * [collectionSort] orders the mapped collection in [sortCollection]. Entries
  * whose catalogue id is no longer in the snapshot stay in Room but are not
  * rendered; this keeps personal data safe across catalogue refreshes.
- * [HomeUiState.hasCollectionItems] ignores the collection query so the sort
- * action stays available while a search has no matches.
+ * [HomeUiState.hasCatalogueItems] and [HomeUiState.hasCollectionItems] ignore
+ * the queries so each tab's sort action stays available while a search has no
+ * matches.
  */
 internal fun buildHomeUiState(
     catalogue: List<CatalogueCoffee>,
     entries: List<CollectionEntry>,
     catalogueQuery: String = "",
     collectionQuery: String = "",
+    catalogueSort: CatalogueSort = CatalogueSort.Name,
     collectionSort: CollectionSort = CollectionSort.Name,
 ): HomeUiState {
     val collectionIds = entries.mapTo(mutableSetOf()) { it.catalogueId }
@@ -124,11 +144,13 @@ internal fun buildHomeUiState(
         }
 
     return HomeUiState(
-        catalogue = filterCatalogue(catalogueItems, catalogueQuery),
+        catalogue = sortCatalogue(filterCatalogue(catalogueItems, catalogueQuery), catalogueSort),
         collection = filterCollection(sortCollection(collectionItems, collectionSort), collectionQuery),
         catalogueQuery = catalogueQuery,
         collectionQuery = collectionQuery,
+        catalogueSort = catalogueSort,
         collectionSort = collectionSort,
+        hasCatalogueItems = catalogueItems.isNotEmpty(),
         hasCollectionItems = collectionItems.isNotEmpty(),
     )
 }
