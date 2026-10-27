@@ -4,6 +4,7 @@ import com.application.kawapka.data.catalogue.CatalogueCoffee
 import com.application.kawapka.data.catalogue.CatalogueRepository
 import com.application.kawapka.data.collection.CollectionEntry
 import com.application.kawapka.data.collection.CollectionRepository
+import com.application.kawapka.ui.catalogue.CatalogueSort
 import com.application.kawapka.ui.collection.CollectionSort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,6 +31,13 @@ class HomeViewModelTest {
             CatalogueCoffee(id = "c", name = "Charlie"),
         )
 
+    private val coffeesWithIntensity =
+        listOf(
+            CatalogueCoffee(id = "a", name = "Alpha", intensity = 3),
+            CatalogueCoffee(id = "b", name = "Bravo", intensity = 9),
+            CatalogueCoffee(id = "c", name = "Charlie"),
+        )
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -47,6 +55,8 @@ class HomeViewModelTest {
 
             assertTrue(viewModel.uiState.value.catalogue.none { item -> item.isInCollection })
             assertTrue(viewModel.uiState.value.collection.isEmpty())
+            assertEquals(CatalogueSort.Name, viewModel.uiState.value.catalogueSort)
+            assertTrue(viewModel.uiState.value.hasCatalogueItems)
             assertFalse(viewModel.uiState.value.hasCollectionItems)
         }
 
@@ -174,6 +184,67 @@ class HomeViewModelTest {
             val restored = viewModel.uiState.value
             assertEquals("", restored.collectionQuery)
             assertEquals(listOf("a", "b"), restored.collection.map { item -> item.coffee.id })
+        }
+
+    @Test
+    fun `catalogue defaults to name order`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffeesWithIntensity }, FakeCollectionRepository())
+
+            val state = viewModel.uiState.value
+            assertEquals(CatalogueSort.Name, state.catalogueSort)
+            assertEquals(listOf("a", "b", "c"), state.catalogue.map { item -> item.coffee.id })
+        }
+
+    @Test
+    fun `setting a catalogue sort reorders only the catalogue`() =
+        runTest {
+            val repository =
+                FakeCollectionRepository(
+                    listOf(
+                        CollectionEntry(catalogueId = "a", dateAdded = 10, rating = 2f),
+                        CollectionEntry(catalogueId = "b", dateAdded = 20, rating = 5f),
+                    ),
+                )
+            val viewModel = HomeViewModel(CatalogueRepository { coffeesWithIntensity }, repository)
+
+            viewModel.setCatalogueSort(CatalogueSort.IntensityDescending)
+
+            val sorted = viewModel.uiState.value
+            assertEquals(CatalogueSort.IntensityDescending, sorted.catalogueSort)
+            assertEquals(listOf("b", "a", "c"), sorted.catalogue.map { item -> item.coffee.id })
+            assertEquals(CollectionSort.Name, sorted.collectionSort)
+            assertEquals(listOf("a", "b"), sorted.collection.map { item -> item.coffee.id })
+
+            viewModel.setCollectionSort(CollectionSort.RatingDescending)
+
+            assertEquals(CatalogueSort.IntensityDescending, viewModel.uiState.value.catalogueSort)
+        }
+
+    @Test
+    fun `catalogue search results follow the selected sort`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffeesWithIntensity }, FakeCollectionRepository())
+
+            viewModel.setCatalogueQuery("a")
+            viewModel.setCatalogueSort(CatalogueSort.IntensityDescending)
+
+            val state = viewModel.uiState.value
+            assertEquals(listOf("b", "a", "c"), state.catalogue.map { item -> item.coffee.id })
+        }
+
+    @Test
+    fun `catalogue sort survives a collection query`() =
+        runTest {
+            val viewModel = HomeViewModel(CatalogueRepository { coffeesWithIntensity }, FakeCollectionRepository())
+            viewModel.setCatalogueSort(CatalogueSort.IntensityDescending)
+
+            viewModel.setCollectionQuery("zulu")
+
+            val state = viewModel.uiState.value
+            assertEquals(CatalogueSort.IntensityDescending, state.catalogueSort)
+            assertTrue(state.hasCatalogueItems)
+            assertFalse(state.hasCollectionItems)
         }
 
     @Test
