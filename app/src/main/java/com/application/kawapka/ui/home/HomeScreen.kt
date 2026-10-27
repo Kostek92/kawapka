@@ -40,6 +40,7 @@ fun HomeScreen(
     selectedTab: HomeTab,
     uiState: HomeUiState,
     onTabSelected: (HomeTab) -> Unit,
+    onCatalogueQueryChange: (String) -> Unit,
     onAddToCollection: (String) -> Unit,
     onRemoveFromCollection: (String) -> Unit,
     onSetRating: (String, Float) -> Unit,
@@ -87,6 +88,8 @@ fun HomeScreen(
             HomeTab.Catalogue ->
                 CatalogueScreen(
                     items = uiState.catalogue,
+                    query = uiState.catalogueQuery,
+                    onQueryChange = onCatalogueQueryChange,
                     onAdd = onAddToCollection,
                     modifier = contentModifier,
                 )
@@ -102,6 +105,7 @@ private fun HomeScreenCataloguePreview() {
             selectedTab = HomeTab.Catalogue,
             uiState = previewState(),
             onTabSelected = {},
+            onCatalogueQueryChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
             onSetRating = { _, _ -> },
@@ -118,6 +122,7 @@ private fun HomeScreenCollectionPreview() {
             selectedTab = HomeTab.Collection,
             uiState = previewState(),
             onTabSelected = {},
+            onCatalogueQueryChange = {},
             onAddToCollection = {},
             onRemoveFromCollection = {},
             onSetRating = { _, _ -> },

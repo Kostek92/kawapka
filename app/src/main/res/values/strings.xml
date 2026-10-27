@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">Kawapka</string>
     <string name="catalogue_empty">No coffees in the catalogue yet.</string>
+    <string name="catalogue_search_placeholder">Search coffees</string>
+    <string name="catalogue_search_clear">Clear search</string>
+    <string name="catalogue_search_no_results">No coffees match “%1$s”.</string>
     <string name="catalogue_intensity">Intensity: %1$d/%2$d</string>
     <string name="catalogue_add">Add</string>
     <string name="catalogue_added">Added</string>
